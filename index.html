@@ -71,6 +71,136 @@
             border-radius: 5px;
         }
     </style>
+    <script type="module">
+        // Firebase SDK 라이브러리 가져오기
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpGbwgnF4Wkd6GMVrWpgAAhKzrs8-VKwU",
+            authDomain: "sparta-7d478.firebaseapp.com",
+            projectId: "sparta-7d478",
+            storageBucket: "sparta-7d478.appspot.com",
+            messagingSenderId: "960310847552",
+            appId: "1:960310847552:web:2746efbe54c2d1848ad7a5",
+            measurementId: "G-37CLLVJXC8"
+        };
+
+        // Firebase 인스턴스 초기화
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        $('#addbtn').click(async function () {
+            let name = $('#name').val();
+            let image = $('#image').val();
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+            await addDoc(collection(db, "profiles"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        })
+
+        let docs = await getDocs(collection(db, "profiles"));
+        docs.forEach((doc) => {
+            let row = doc.data();
+
+            let image = row['image'];
+            let name = row['name'];
+            let mbti = row['mbti'];
+            let merit = row['merit'];
+            let cbst = row['cbst'];
+            let blog = row['blog'];
+            let git = row['git'];
+
+            let temp_html = `<div class="col">
+                    <div class="card h-100" style="padding: 10px;">
+                        <img src="${image}"
+                            class="card-img-top bgred" alt="...">
+                        <div class="card-body">
+    
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" colspan="2">
+                                            <h4 class="text-center">${name}</h4>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    <tr>
+                                        <th style="width: 30%;" scope="row">MBTI</th>
+                                        <td style="width: 70%;">${mbti}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">장점</th>
+                                        <td>${merit}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">협업스타일</th>
+                                        <td>${cbst}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">블로그주소</th>
+                                        <td><a href="#" class="text-secondary">${blog}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">깃허브주소</th>
+                                        <td><a href="#" class="text-secondary">${git}</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-2 p-3 bg-body rounded shadow-sm">
+                            </div>
+    
+                            <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
+                                <h2 class="fs-6">방명록 쓰기</h2>
+                                <div class="input-group mb-3">
+                                    <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                        <option selected disabled hidden>😊</option>
+                                        <option value="😊">😊</option>
+                                        <option value="😍">😍</option>
+                                        <option value="🤔">🤔</option>
+                                        <option value="😒">😒</option>
+                                        <option value="😭">😭</option>
+                                        <option value="😨">😨</option>
+                                        <option value="😵">😵</option>
+                                    </select>
+                                    <input id="" class="form-control" type="text" style="flex: 9;">
+                                </div>
+                            </div>
+    
+                            <br>
+                            <div class="text-end">
+                                <button id="btnComment" type="button" onclick="memberComment()"
+                                    class="btn btn-outline-primary">방명록 쓰기</button>
+                                <button id="btnUpdate" type="button" onclick="memberUpdeate()"
+                                    class="btn btn-outline-primary">수정</button>
+                                <button id="btnRemove" type="button" onclick="memberDelete()"
+                                    class="btn btn-outline-primary">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`; // FIXME
+            $('#cards').append(temp_html);
+        });
+    </script>
     <script>
         function memberAdd() {
             $('#postingbox').toggle();
@@ -117,7 +247,8 @@
                         <!-- fetch weather -->
                         <img src="https://openweathermap.org/img/w/01d.png" id="weather" width="60"
                             style="vertical-align: middle;">
-                    </a></li>
+                    </a>
+                </li>
             </ul>
         </header>
     </div>
@@ -143,8 +274,16 @@
         <hr>
         <!-- 부트스트랩 input group -->
         <div class="input-group mb-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
+                <input id="name" type="text" class="form-control" style="flex: 4;">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
+                <input id="image" type="text" class="form-control" style="flex: 4;">
+            </div>
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
-            <select class="form-select" id="inputGroupSelect01" style="flex: 4;">
+            <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
                 <option selected disabled hidden>MBTI 선택</option>
                 <script>
                     $(document).ready(function () {
@@ -156,7 +295,7 @@
                                     mbtiArray[3].forEach(e4 => {
                                         mbti = e1 + e2 + e3 + e4;
                                         let mbti_html = `<option value="${mbti}">${mbti}</option>`;
-                                        $('#inputGroupSelect01').append(mbti_html);
+                                        $('.inputGroupSelect01').append(mbti_html);
                                     });
                                 });
                             });
@@ -167,22 +306,22 @@
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="merit" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="cbst" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="blog" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="git" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="text-center">
-            <button onclick="alert('등록 함수 구현 필요');" type="button" class="btn btn-danger" id="btn1">등록하기</button>
+            <button type="button" class="btn btn-danger" id="addbtn">등록하기</button>
         </div>
     </div>
 
@@ -245,7 +384,7 @@
                         <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
                             <h2 class="fs-6">방명록 쓰기</h2>
                             <div class="input-group mb-3">
-                                <select id="" class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
                                     <option selected disabled hidden>😊</option>
                                     <option value="😊">😊</option>
                                     <option value="😍">😍</option>
