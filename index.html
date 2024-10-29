@@ -61,18 +61,39 @@
         .bgred {
             background-color: red;
         }
+
+        .mypostingbox {
+            /* background-color: green; */
+            width: 400px;
+            margin: 30px auto 30px auto;
+            padding: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
     </style>
     <script>
         function memberAdd() {
-            //팝업창 띄우기
-            window.open("memberAdd.html", "멤버 추가하기", "width=400,  height=500, left="+((window.screen.width-400)/2)+", top="+((window.screen.height-500)/2));
+            $('#postingbox').toggle();
         }
-        function memberComment() {
+        function commentAdd() {
+            $('#postingbox').toggle();
+        }
 
+        function memberComment() {
+            $('#commentWrite').toggle();
+            $('#btnUpdate').toggle();
+            $('#btnRemove').toggle();
+            if ($('#commentWrite').css("display") == "none") {
+                $('#btnComment').text('방명록 쓰기');
+            } else {
+                $('#btnComment').text('취소');
+            }
         }
+
         function memberUpdeate() {
 
         }
+
         function memberDelete() {
 
         }
@@ -80,6 +101,8 @@
 </head>
 
 <body>
+
+    <!-- 헤더 -->
     <div class="container">
         <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
             <a href="index.html"
@@ -98,6 +121,8 @@
             </ul>
         </header>
     </div>
+
+    <!-- 점보트론 -->
     <div class="main">
         <div class="p-5 mb-4 bg-body-tertiary rounded-3">
             <div class="container-fluid py-5 text-center">
@@ -107,6 +132,57 @@
                     <button type="button" onclick="memberAdd();" class="btn btn-primary">멤버 등록</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- 등록하기 -->
+    <div class="mypostingbox" id="postingbox" style="display: none;">
+        <div>
+            <h3 class="text-center">멤버 등록하기</h3>
+        </div>
+        <hr>
+        <!-- 부트스트랩 input group -->
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
+            <select class="form-select" id="inputGroupSelect01" style="flex: 4;">
+                <option selected disabled hidden>MBTI 선택</option>
+                <script>
+                    $(document).ready(function () {
+                        let mbti = '';
+                        let mbtiArray = [['E', 'I'], ['N', 'S'], ['F', 'T'], ['J', 'P']];
+                        mbtiArray[0].forEach(e1 => {
+                            mbtiArray[1].forEach(e2 => {
+                                mbtiArray[2].forEach(e3 => {
+                                    mbtiArray[3].forEach(e4 => {
+                                        mbti = e1 + e2 + e3 + e4;
+                                        let mbti_html = `<option value="${mbti}">${mbti}</option>`;
+                                        $('#inputGroupSelect01').append(mbti_html);
+                                    });
+                                });
+                            });
+                        });
+                    })
+                </script>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
+            <input type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
+            <input type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
+            <input type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
+            <input type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="text-center">
+            <button onclick="alert('등록 함수 구현 필요');" type="button" class="btn btn-danger" id="btn1">등록하기</button>
         </div>
     </div>
 
@@ -151,8 +227,8 @@
                             </tbody>
                         </table>
                         <div class="mt-2 p-3 bg-body rounded shadow-sm">
-                            <h2 class="fs-6">방명록</h2>
 
+                            <h2 class="fs-6">방명록</h2>
                             <!-- 방명록 템플릿 -->
                             <div class="card mb-3" style="max-width: 600px;">
                                 <div class="row g-0">
@@ -166,10 +242,10 @@
                         </div>
 
                         <!-- 방명록 쓰기 템플릿 -->
-                        <div class="mt-2 p-3 bg-body rounded shadow-sm">
+                        <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
                             <h2 class="fs-6">방명록 쓰기</h2>
                             <div class="input-group mb-3">
-                                <select id = "" class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                <select id="" class="form-select" id="inputGroupSelect01" style="flex: 1;">
                                     <option selected disabled hidden>😊</option>
                                     <option value="😊">😊</option>
                                     <option value="😍">😍</option>
@@ -185,9 +261,12 @@
 
                         <br>
                         <div class="text-end">
-                            <button type="button" onclick="memberComment()" class="btn btn-outline-primary">방명록 쓰기</button>
-                            <button type="button" onclick="memberUpdeate()" class="btn btn-outline-primary">수정</button>
-                            <button type="button" onclick="memberDelete()" class="btn btn-outline-primary">삭제</button>
+                            <button id="btnComment" type="button" onclick="memberComment()"
+                                class="btn btn-outline-primary">방명록 쓰기</button>
+                            <button id="btnUpdate" type="button" onclick="memberUpdeate()"
+                                class="btn btn-outline-primary">수정</button>
+                            <button id="btnRemove" type="button" onclick="memberDelete()"
+                                class="btn btn-outline-primary">삭제</button>
                         </div>
                     </div>
                 </div>
