@@ -117,6 +117,7 @@
             window.location.reload();
         })
 
+        let cardId = 1;
         let docs = await getDocs(collection(db, "profiles"));
         docs.forEach((doc) => {
             let row = doc.data();
@@ -130,7 +131,7 @@
             let git = row['git'];
 
             let temp_html = `<div class="col">
-                    <div class="card h-100" style="padding: 10px;">
+                    <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
                             class="card-img-top bgred" alt="...">
                         <div class="card-body">
@@ -158,18 +159,18 @@
                                     </tr>
                                     <tr>
                                         <th scope="row">블로그주소</th>
-                                        <td><a href="${git}" class="text-secondary">${blog}</a></td>
+                                        <td><a href="#" class="text-secondary">${blog}</a></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">깃허브주소</th>
-                                        <td><a href="${git}" class="text-secondary">${git}</a></td>
+                                        <td><a href="#" class="text-secondary">${git}</a></td>
                                     </tr>
                                 </tbody>
                             </table>
                             <div class="mt-2 p-3 bg-body rounded shadow-sm">
                             </div>
     
-                            <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
+                            <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
                                 <h2 class="fs-6">방명록 쓰기</h2>
                                 <div class="input-group mb-3">
                                     <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
@@ -188,26 +189,47 @@
     
                             <br>
                             <div class="text-end">
-                                <button id="btnComment" type="button" onclick="memberComment()"
+                                <button id="commentSaveBtn-${cardId}" type="button"
+                                    class="btn btn-outline-primary" style="display:none;">저장</button>
+                                <button id="commentBtn-${cardId}" type="button"
                                     class="btn btn-outline-primary">방명록 쓰기</button>
-                                <button id="btnUpdate" type="button" onclick="memberUpdeate()"
+                                <button id="updateBtn-${cardId}" type="button" onclick="memberUpdeate()"
                                     class="btn btn-outline-primary">수정</button>
-                                <button id="btnRemove" type="button" onclick="memberDelete()"
+                                <button id="removeBtn-${cardId}" type="button" onclick="memberDelete()"
                                     class="btn btn-outline-primary">삭제</button>
                             </div>
                         </div>
                     </div>
                 </div>`; // FIXME
             $('#cards').append(temp_html);
+            cardId++;
         });
-    </script>
-    <script>
-        function memberAdd() {
-            $('#postingbox').toggle();
-        }
-        function commentAdd() {
-            $('#postingbox').toggle();
-        }
+
+        //버튼 클릭 이벤트
+        $('#cards').on('click', `button`, function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const cardId = btnId.split('-')[1];
+
+            if (action === 'commentBtn') {              //방명록 쓰기
+                $(`#commentSaveBtn-${cardId}`).toggle();
+                $(`#commentWrite-${cardId}`).toggle();
+                $(`#updateBtn-${cardId}`).toggle();
+                $(`#removeBtn-${cardId}`).toggle();
+                if ($(`#commentWrite-${cardId}`).css("display") == "none") {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                }
+            } else if (action === 'updateBtn') {        //멤버 정보 수정
+
+            } else if (action === 'removeBtn') {        //멤버 카드 삭제
+            } else if (action === 'commentSaveBtn') {      //방명록 저장
+                alert('db 저장 후 리로드될 예정');
+            }
+
+        });
+
 
         function memberComment() {
             $('#commentWrite').toggle();
@@ -219,6 +241,16 @@
                 $('#btnComment').text('취소');
             }
         }
+    </script>
+    <script>
+        function memberAdd() {
+            $('#postingbox').toggle();
+        }
+        function commentAdd() {
+            $('#postingbox').toggle();
+        }
+
+
 
         function memberUpdeate() {
 
