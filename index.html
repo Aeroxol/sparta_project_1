@@ -8,6 +8,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
 
@@ -19,8 +22,8 @@
 
         .main {
             color: white;
-            background-color: green;
-            /* background-image: url('');
+            background: linear-gradient(to right, blue, black, green);
+            /* background-image: url('https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg');
             background-position: center;
             background-size: cover; */
         }
@@ -70,7 +73,254 @@
             border: 1px solid white;
             border-radius: 5px;
         }
+
+        /* 날씨 슬라이더를 위한 css */
+        .weatherSlider {
+            background-color: aliceblue;
+            width: 100%;
+            height: 25px;
+            margin: auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .weatherItem {
+            /* background-color: red; */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
+    <script type="module">
+        // Firebase SDK 라이브러리 가져오기
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpGbwgnF4Wkd6GMVrWpgAAhKzrs8-VKwU",
+            authDomain: "sparta-7d478.firebaseapp.com",
+            projectId: "sparta-7d478",
+            storageBucket: "sparta-7d478.appspot.com",
+            messagingSenderId: "960310847552",
+            appId: "1:960310847552:web:2746efbe54c2d1848ad7a5",
+            measurementId: "G-37CLLVJXC8"
+        };
+
+        // Firebase 인스턴스 초기화
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        //db에서 멤버 카드 불러오기
+        let cardId = 1;
+        // 날씨 정보를 가져와서 weatherSlider에 추가
+        let url = "http://spartacodingclub.shop/sparta_api/seoulair";
+        fetch(url).then(res => res.json()).then(data => {
+            let row = data['RealtimeCityAir']['row'];
+            row.forEach((e) => {
+                let location = e['MSRSTE_NM'];
+                let dust = e['IDEX_NM'];
+                $('#weatherSlider').append(`<div class="weatherItem">${location} : ${dust}</div>`);
+            })
+        })
+
+        let docs = await getDocs(collection(db, "profiles"));
+        docs.forEach((doc) => {
+            let row = doc.data();
+
+            let image = row['image'];
+            let name = row['name'];
+            let mbti = row['mbti'];
+            let merit = row['merit'];
+            let cbst = row['cbst'];
+            let blog = row['blog'];
+            let git = row['git'];
+
+            let temp_html = `<div class="col">
+                    <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
+                        <img src="${image}"
+                            class="card-img-top bgred" alt="...">
+                        <div class="card-body">
+    
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" colspan="2">
+                                            <h4 class="text-center">${name}</h4>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    <tr>
+                                        <th style="width: 30%;" scope="row">MBTI</th>
+                                        <td style="width: 70%;">${mbti}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">장점</th>
+                                        <td>${merit}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">협업스타일</th>
+                                        <td>${cbst}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">블로그주소</th>
+                                        <td><a href="#" class="text-secondary">${blog}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">깃허브주소</th>
+                                        <td><a href="#" class="text-secondary">${git}</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="mt-2 p-3 bg-body rounded shadow-sm">
+                            </div>
+      
+                            <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
+                                <h2 class="fs-6">방명록</h2>
+                                <div class="card mb-3" style="max-width: 600px;">
+                                    <div id='nocommenttext-${cardId}' class="row g-0">
+                                        <div class="card-body">
+                                            <p id="" class="card-text">방명록이 아직 없습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
+                                <h2 class="fs-6">방명록 쓰기</h2>
+                                <div class="input-group mb-3">
+                                    <select id='commentimogi-${cardId}' class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                        <option selected disabled hidden>😊</option>
+                                        <option value="😊">😊</option>
+                                        <option value="😍">😍</option>
+                                        <option value="🤔">🤔</option>
+                                        <option value="😒">😒</option>
+                                        <option value="😭">😭</option>
+                                        <option value="😨">😨</option>
+                                        <option value="😵">😵</option>
+                                    </select>
+                                    <input id="commenttext-${cardId}" class="form-control" type="text" style="flex: 9;">
+                                </div>
+                            </div>
+
+                        
+                            <br>
+                            <div class="text-end">
+                                <button id="commentSaveBtn-${cardId}" type="button"
+                                    class="btn btn-outline-primary" style="display:none;">저장</button>
+                                <button id="commentBtn-${cardId}" type="button"
+                                    class="btn btn-outline-primary">방명록 쓰기</button>
+                                <button id="updateBtn-${cardId}" type="button" onclick="memberUpdeate()"
+                                    class="btn btn-outline-primary">수정</button>
+                                <button id="removeBtn-${cardId}" type="button" onclick="memberDelete()"
+                                    class="btn btn-outline-primary">삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`; // FIXME
+            $('#cards').append(temp_html);
+            cardId++;
+        });
+
+        //멤버 등록 토글 이벤트
+        $('#memberAdd').click(async function () {
+            $('#addbtn').text('등록하기');
+            $('#postingbox').toggle();
+        });
+
+        //멤버 등록 저장 버튼 이벤트
+        $('#addbtn').click(async function () {
+            let name = $('#name').val();
+            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
+            //let image = $('#image').val();  
+            let image = '';
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+            await addDoc(collection(db, "profiles"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        });
+
+        //버튼 클릭 이벤트
+        $('#cards').on('click', `button`, function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const cardId = btnId.split('-')[1];
+
+            if (action === 'commentBtn') {              //방명록 쓰기
+                $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
+                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
+                $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
+                $(`#removeBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
+                if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                }
+            } else if (action === 'updateBtn') {        //멤버 정보 수정
+                $('#addbtn').text('수정하기');
+                $('#postingbox').toggle();
+            } else if (action === 'removeBtn') {        //멤버 카드 삭제
+
+            } else if (action === 'commentSaveBtn') {      //방명록 저장
+                $(``);
+                let imogi = $(`#commentimogi-${cardId}`).val();
+                if (imogi === null) imogi = '😊';
+                let comment = $(`#commenttext-${cardId}`).val();
+
+                let temp_html = `
+                            <div class="card mb-3" style="max-width: 600px;">
+                                <div class="row g-0">
+                                    <div class="card-body">
+                                        <p id="" class="card-text">${imogi}</p>
+                                        <p id="" class="card-text">${comment}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+
+                $(`#commentlist-${cardId}`).append(temp_html);          //방명록 리스트에 방명록 추가하기
+                $(`#commentSaveBtn-${cardId}`).toggle();                  //저장 버튼 안 보이기
+                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
+                $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
+                $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
+
+                if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                }
+                if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
+                    $(`#nocommenttext-${cardId}`).hide();
+                }
+                $(`#commentimogi-${cardId}`).val('😊');
+                $(`#commenttext-${cardId}`).val('');
+                //alert('db 저장 후 리로드될 예정');
+            } else if (action == - '') {
+
+            }
+        });
+
+    </script>
     <script>
         function memberAdd() {
             $('#postingbox').toggle();
@@ -79,16 +329,7 @@
             $('#postingbox').toggle();
         }
 
-        function memberComment() {
-            $('#commentWrite').toggle();
-            $('#btnUpdate').toggle();
-            $('#btnRemove').toggle();
-            if ($('#commentWrite').css("display") == "none") {
-                $('#btnComment').text('방명록 쓰기');
-            } else {
-                $('#btnComment').text('취소');
-            }
-        }
+
 
         function memberUpdeate() {
 
@@ -97,6 +338,22 @@
         function memberDelete() {
 
         }
+
+        // 문서 시작시 날씨 슬라이더 움직이기
+        $(document).ready(function () {
+            setInterval(function () {
+                const firstItem = $('.weatherItem').first();
+
+                firstItem.animate(
+                    { marginTop: '-=25px' }, // 항목 높이에 맞게 조정
+                    500,
+                    function () {
+                        firstItem.appendTo('.weatherSlider'); // 첫 번째 항목을 리스트 마지막으로 이동
+                        firstItem.css('marginTop', 0); // 항목의 위치를 초기화
+                    }
+                );
+            }, 2000); // 2초마다 한 항목씩 슬라이드
+        });
     </script>
 </head>
 
@@ -113,11 +370,14 @@
                 </svg>
             </a>
             <ul class="nav nav-pills">
-                <li class="nav-item"><a href="#" class="nav-link">현재 서울의 날씨 :
-                        <!-- fetch weather -->
-                        <img src="https://openweathermap.org/img/w/01d.png" id="weather" width="60"
-                            style="vertical-align: middle;">
-                    </a></li>
+                <li class="nav-item">현재 서울의 날씨
+                    <div id="weatherSlider" class="weatherSlider">
+                        <!-- 여기에 날씨 슬라이더 아이템 추가 -->
+                    </div>
+                    <!-- fetch weather -->
+                    <!-- <img src="https://openweathermap.org/img/w/01d.png" id="weather" width="60"
+                        style="vertical-align: middle;"> -->
+                </li>
             </ul>
         </header>
     </div>
@@ -126,11 +386,15 @@
     <div class="main">
         <div class="p-5 mb-4 bg-body-tertiary rounded-3">
             <div class="container-fluid py-5 text-center">
-                <h1 id="title" class="display-5 fw-bold">팀 9조 이름[need to update]</h1>
-                <p class="fs-4">팀 소개 문구[need to update]</p>
-                <div class="text-end">
-                    <button type="button" onclick="memberAdd();" class="btn btn-primary">멤버 등록</button>
-                </div>
+                <h1 id="title" class="display-5 fw-bold"><span style="color:crimson;">TEAM<br>VAN THING</span>
+                </h1>
+                <p class="fs-4"><br>팀원도 반토막나고...<br>팀장도 탈주를 하고...<br>제일 안 좋다는 입구자리에 배치됐지만...<br><br>우리는 격하게 서버개발자가
+                    되고
+                    싶다!</p>
+            </div>
+            <div class="text-end">
+                <button type="button" onclick="memberAdd()" class="btn btn-primary" style="border: 1px solid white;">멤버
+                    등록</button>
             </div>
         </div>
     </div>
@@ -143,8 +407,17 @@
         <hr>
         <!-- 부트스트랩 input group -->
         <div class="input-group mb-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
+                <input id="name" type="text" class="form-control" style="flex: 4;">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
+                <input id="image-upload" type="file" class="form-control" style="flex:4;">
+                <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
+            </div>
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
-            <select class="form-select" id="inputGroupSelect01" style="flex: 4;">
+            <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
                 <option selected disabled hidden>MBTI 선택</option>
                 <script>
                     $(document).ready(function () {
@@ -156,7 +429,7 @@
                                     mbtiArray[3].forEach(e4 => {
                                         mbti = e1 + e2 + e3 + e4;
                                         let mbti_html = `<option value="${mbti}">${mbti}</option>`;
-                                        $('#inputGroupSelect01').append(mbti_html);
+                                        $('.inputGroupSelect01').append(mbti_html);
                                     });
                                 });
                             });
@@ -167,22 +440,22 @@
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="merit" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="cbst" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="blog" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="input-group mb-3">
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
-            <input type="text" class="form-control" style="flex: 4;">
+            <input id="git" type="text" class="form-control" style="flex: 4;">
         </div>
         <div class="text-center">
-            <button onclick="alert('등록 함수 구현 필요');" type="button" class="btn btn-danger" id="btn1">등록하기</button>
+            <button type="button" class="btn btn-danger" id="addbtn">등록하기</button>
         </div>
     </div>
 
@@ -227,25 +500,23 @@
                             </tbody>
                         </table>
                         <div class="mt-2 p-3 bg-body rounded shadow-sm">
-
                             <h2 class="fs-6">방명록</h2>
                             <!-- 방명록 템플릿 -->
-                            <div class="card mb-3" style="max-width: 600px;">
+                            <!-- <div class="card mb-3" style="max-width: 600px;">
                                 <div class="row g-0">
                                     <div class="card-body">
                                         <p id="" class="card-text">😊</p>
                                         <p id="" class="card-text">예시로 다는 방명록입니다.</p>
                                     </div>
                                 </div>
-                            </div>
-
+                            </div> -->
                         </div>
 
                         <!-- 방명록 쓰기 템플릿 -->
                         <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
                             <h2 class="fs-6">방명록 쓰기</h2>
                             <div class="input-group mb-3">
-                                <select id="" class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
                                     <option selected disabled hidden>😊</option>
                                     <option value="😊">😊</option>
                                     <option value="😍">😍</option>
