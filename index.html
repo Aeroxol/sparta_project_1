@@ -182,7 +182,7 @@
             $('#cards').append(temp_html);
             cardId++;
         });
-        
+
         //멤버 등록 토글 이벤트
         $('#memberAdd').click(async function () {
             $('#addbtn').text('등록하기');
@@ -240,9 +240,41 @@
             }
 
         });
-
+        
     </script>
-    <script>
+    <script> 
+        function memberAdd() {
+            $('#postingbox').toggle();
+        }
+        function commentAdd() {
+            $('#postingbox').toggle();
+        }
+
+
+
+        function memberUpdeate() {
+
+        }
+
+        function memberDelete() {
+
+        }
+
+        // 문서 시작시 날씨 슬라이더 움직이기
+        $(document).ready(function () {
+            setInterval(function () {
+                const firstItem = $('.weatherItem').first();
+
+                firstItem.animate(
+                    { marginTop: '-=25px' }, // 항목 높이에 맞게 조정
+                    500,
+                    function () {
+                        firstItem.appendTo('.weatherSlider'); // 첫 번째 항목을 리스트 마지막으로 이동
+                        firstItem.css('marginTop', 0); // 항목의 위치를 초기화
+                    }
+                );
+            }, 2000); // 2초마다 한 항목씩 슬라이드
+        });
     </script>
 </head>
 
