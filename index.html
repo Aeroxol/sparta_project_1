@@ -271,9 +271,9 @@
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
                 $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
                 $(`#removeBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
-                if($(`#commentBtn-${cardId}`).text() === '방명록 쓰기'){
+                if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
                     $(`#commentBtn-${cardId}`).text('취소');
-                }else {
+                } else {
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
             } else if (action === 'updateBtn') {        //멤버 정보 수정
@@ -303,10 +303,10 @@
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
                 $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
                 $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
-                
-                if($(`#commentBtn-${cardId}`).text() === "방명록 쓰기"){
+
+                if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
                     $(`#commentBtn-${cardId}`).text('취소');
-                }else {
+                } else {
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
                 if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
@@ -315,7 +315,7 @@
                 $(`#commentimogi-${cardId}`).val('😊');
                 $(`#commenttext-${cardId}`).val('');
                 //alert('db 저장 후 리로드될 예정');
-            } else if (action ==- '') {
+            } else if (action == - '') {
 
             }
         });
@@ -386,22 +386,15 @@
     <div class="main">
         <div class="p-5 mb-4 bg-body-tertiary rounded-3">
             <div class="container-fluid py-5 text-center">
-                <<<<<<< Updated upstream <h1 id="title" class="display-5 fw-bold">팀 9조 이름[need to update]</h1>
-                    <p class="fs-4">팀 소개 문구[need to update]</p>
-                    <div class="text-end">
-                        <button type="button" id="memberAdd" class="btn btn-primary">멤버 등록</button>
-                    </div>
-                    =======
-                    <h1 id="title" class="display-5 fw-bold"><span style="color:crimson;">TEAM<br>VAN THING</span>
-                    </h1>
-                    <p class="fs-4"><br>팀원도 반토막나고...<br>팀장도 탈주를 하고...<br>제일 안 좋다는 입구자리에 배치됐지만...<br><br>우리는 격하게 서버개발자가
-                        되고
-                        싶다!</p>
+                <h1 id="title" class="display-5 fw-bold"><span style="color:crimson;">TEAM<br>VAN THING</span>
+                </h1>
+                <p class="fs-4"><br>팀원도 반토막나고...<br>팀장도 탈주를 하고...<br>제일 안 좋다는 입구자리에 배치됐지만...<br><br>우리는 격하게 서버개발자가
+                    되고
+                    싶다!</p>
             </div>
             <div class="text-end">
                 <button type="button" onclick="memberAdd()" class="btn btn-primary" style="border: 1px solid white;">멤버
                     등록</button>
-                >>>>>>> Stashed changes
             </div>
         </div>
     </div>
