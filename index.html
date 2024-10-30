@@ -114,29 +114,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        $('#addbtn').click(async function () {
-            let name = $('#name').val();
-            let image = $('#image').val();
-            let mbti = $('#mbti').val();
-            let merit = $('#merit').val();
-            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
-            let blog = $('#blog').val();
-            let git = $('#git').val();
-
-            let doc = {
-                'name': name,
-                'image': image,
-                'mbti': mbti,
-                'merit': merit,
-                'cbst': cbst,
-                'blog': blog,
-                'git': git
-            };
-            await addDoc(collection(db, "profiles"), doc);
-            alert('저장 완료!');
-            window.location.reload();
-        })
-
+        //db에서 멤버 카드 불러오기
+        let cardId = 1;
         // 날씨 정보를 가져와서 weatherSlider에 추가
         let url = "http://spartacodingclub.shop/sparta_api/seoulair";
         fetch(url).then(res => res.json()).then(data => {
@@ -161,7 +140,7 @@
             let git = row['git'];
 
             let temp_html = `<div class="col memberCard">
-                    <div class="card h-100" style="padding: 10px;">
+                    <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
                             class="cardImg card-img-top bgred" alt="...">
                         <div class="card-body">
@@ -189,7 +168,7 @@
                                     </tr>
                                     <tr>
                                         <th scope="row">블로그주소</th>
-                                        <td class="cardBlog"><a href="${git}" class="text-secondary">${blog}</a></td>
+                                        <td class="cardBlog"><a href="${blog}" class="text-secondary">${blog}</a></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">깃허브주소</th>
@@ -200,7 +179,7 @@
                             <div class="mt-2 p-3 bg-body rounded shadow-sm">
                             </div>
     
-                            <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
+                            <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
                                 <h2 class="fs-6">방명록 쓰기</h2>
                                 <div class="input-group mb-3">
                                     <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
@@ -219,16 +198,19 @@
     
                             <br>
                             <div class="text-end">
-                                <button id="btnComment" type="button" onclick="memberComment()"
+                                <button id="commentSaveBtn-${cardId}" type="button"
+                                    class="btn btn-outline-primary" style="display:none;">저장</button>
+                                <button id="commentBtn-${cardId}" type="button"
                                     class="btn btn-outline-primary">방명록 쓰기</button>
-                                <button id="btnUpdate" type="button" onclick="memberUpdeate()"
+                                <button id="updateBtn-${cardId}" type="button" onclick="memberUpdeate()"
                                     class="btn btn-outline-primary">수정</button>
-                                <button type="button" class="deleteBtn btn btn-outline-primary">삭제</button>
+                                <button id="removeBtn-${cardId}" type="button" class="deleteBtn btn btn-outline-primary">삭제</button>
                             </div>
                         </div>
                     </div>
                 </div>`; // FIXME
             $('#cards').append(temp_html);
+            cardId++;
         });
 
         $('.deleteBtn').click(async function () {
@@ -263,8 +245,66 @@
         })
 
 
+        //멤버 등록 토글 이벤트
+        $('#memberAdd').click(async function () {
+            $('#addbtn').text('등록하기');
+            $('#postingbox').toggle();
+        });
+
+        //멤버 등록 저장 버튼 이벤트
+        $('#addbtn').click(async function () {
+            let name = $('#name').val();
+            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
+            //let image = $('#image').val();  
+            let image = '';
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+            await addDoc(collection(db, "profiles"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        });
+
+        //버튼 클릭 이벤트
+        $('#cards').on('click', `button`, function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const cardId = btnId.split('-')[1];
+
+            if (action === 'commentBtn') {              //방명록 쓰기
+                $(`#commentSaveBtn-${cardId}`).toggle();
+                $(`#commentWrite-${cardId}`).toggle();
+                $(`#updateBtn-${cardId}`).toggle();
+                $(`#removeBtn-${cardId}`).toggle();
+                if ($(`#commentWrite-${cardId}`).css("display") == "none") {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                }
+            } else if (action === 'updateBtn') {        //멤버 정보 수정
+                $('#addbtn').text('수정하기');
+                $('#postingbox').toggle();
+            } else if (action === 'removeBtn') {        //멤버 카드 삭제
+            } else if (action === 'commentSaveBtn') {      //방명록 저장
+                alert('db 저장 후 리로드될 예정');
+            }
+
+        });
+        
     </script>
-    <script>
+    <script> 
         function memberAdd() {
             $('#postingbox').toggle();
         }
@@ -272,16 +312,7 @@
             $('#postingbox').toggle();
         }
 
-        function memberComment() {
-            $('#commentWrite').toggle();
-            $('#btnUpdate').toggle();
-            $('#btnRemove').toggle();
-            if ($('#commentWrite').css("display") == "none") {
-                $('#btnComment').text('방명록 쓰기');
-            } else {
-                $('#btnComment').text('취소');
-            }
-        }
+
 
         function memberUpdeate() {
 
@@ -337,7 +368,7 @@
                 <h1 id="title" class="display-5 fw-bold">팀 9조 이름[need to update]</h1>
                 <p class="fs-4">팀 소개 문구[need to update]</p>
                 <div class="text-end">
-                    <button type="button" onclick="memberAdd();" class="btn btn-primary">멤버 등록</button>
+                    <button type="button" id="memberAdd" class="btn btn-primary">멤버 등록</button>
                 </div>
             </div>
         </div>
@@ -357,7 +388,8 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
-                <input id="image" type="text" class="form-control" style="flex: 4;">
+                <input id="image-upload" type="file" class="form-control" style="flex:4;">
+                <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
             </div>
             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
             <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
