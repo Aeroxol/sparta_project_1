@@ -271,10 +271,10 @@
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
                 $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
                 $(`#removeBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
-                if ($(`#commentWrite-${cardId}`).css("display") == "none") {
-                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
-                } else {
+                if($(`#commentBtn-${cardId}`).text() === '방명록 쓰기'){
                     $(`#commentBtn-${cardId}`).text('취소');
+                }else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
             } else if (action === 'updateBtn') {        //멤버 정보 수정
                 $('#addbtn').text('수정하기');
@@ -303,15 +303,20 @@
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
                 $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
                 $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
-                if ($(`#commentWrite-${cardId}`).css("display") === "none") {
-                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
-                } else {
+                
+                if($(`#commentBtn-${cardId}`).text() === "방명록 쓰기"){
                     $(`#commentBtn-${cardId}`).text('취소');
+                }else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
                 if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
                     $(`#nocommenttext-${cardId}`).hide();
                 }
+                $(`#commentimogi-${cardId}`).val('😊');
+                $(`#commenttext-${cardId}`).val('');
                 //alert('db 저장 후 리로드될 예정');
+            } else if (action ==- '') {
+
             }
         });
 
