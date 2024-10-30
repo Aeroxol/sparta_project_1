@@ -96,6 +96,7 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { doc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -138,40 +139,40 @@
             let blog = row['blog'];
             let git = row['git'];
 
-            let temp_html = `<div class="col">
+            let temp_html = `<div class="col memberCard">
                     <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
-                            class="card-img-top bgred" alt="...">
+                            class="cardImg card-img-top bgred" alt="...">
                         <div class="card-body">
     
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col" colspan="2">
-                                            <h4 class="text-center">${name}</h4>
+                                            <h4 class="cardName text-center">${name}</h4>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-group-divider">
                                     <tr>
                                         <th style="width: 30%;" scope="row">MBTI</th>
-                                        <td style="width: 70%;">${mbti}</td>
+                                        <td class="cardMBTI" style="width: 70%;">${mbti}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">장점</th>
-                                        <td>${merit}</td>
+                                        <td class="cardMerit">${merit}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">협업스타일</th>
-                                        <td>${cbst}</td>
+                                        <td class="cardCbst">${cbst}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">블로그주소</th>
-                                        <td><a href="#" class="text-secondary">${blog}</a></td>
+                                        <td class="cardBlog"><a href="${blog}" class="text-secondary">${blog}</a></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">깃허브주소</th>
-                                        <td><a href="#" class="text-secondary">${git}</a></td>
+                                        <td class="cardGit"><a href="${git}" class="text-secondary">${git}</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -203,8 +204,7 @@
                                     class="btn btn-outline-primary">방명록 쓰기</button>
                                 <button id="updateBtn-${cardId}" type="button" onclick="memberUpdeate()"
                                     class="btn btn-outline-primary">수정</button>
-                                <button id="removeBtn-${cardId}" type="button" onclick="memberDelete()"
-                                    class="btn btn-outline-primary">삭제</button>
+                                <button id="removeBtn-${cardId}" type="button" class="deleteBtn btn btn-outline-primary">삭제</button>
                             </div>
                         </div>
                     </div>
@@ -212,6 +212,38 @@
             $('#cards').append(temp_html);
             cardId++;
         });
+
+        $('.deleteBtn').click(async function () {
+            const cards = collection(db, "profiles");
+            const card = $(this).closest('.memberCard');
+            const name = card.find('.cardName').text();
+            const image = card.find('.cardImg').attr('src');
+            const mbti = card.find('.cardMBTI').text();
+            const merit = card.find('.cardMerit').text();
+            const cbst = card.find('.cardCbst').text();
+            const blog = card.find('.cardBlog').text();
+            const git = card.find('.cardGit').text();
+
+            const q = query(cards,
+                where("name", "==", name),
+                where("image", "==", image),
+                where("mbti", "==", mbti),
+                where("merit", "==", merit),
+                where("cbst", "==", cbst),
+                where("blog", "==", blog),
+                where("git", "==", git)
+            );
+
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.docs.length > 0) {
+                for (const docSnapshot of querySnapshot.docs) {
+                    await deleteDoc(doc(db, "profiles", docSnapshot.id));
+                    console.log(`ID ${docSnapshot.id} deleted`);
+                }
+                window.location.reload();
+            }
+        })
+
 
         //멤버 등록 토글 이벤트
         $('#memberAdd').click(async function () {
@@ -283,10 +315,6 @@
 
 
         function memberUpdeate() {
-
-        }
-
-        function memberDelete() {
 
         }
 
@@ -409,40 +437,40 @@
     <div class="membercards">
         <div id="cards" class="row cardwrap row-cols-1 row-cols-md-4 g-4">
             <!-- 카드 템플릿. 멤더 등록시 이 부분에 멤버 카드 추가 -->
-            <div class="col">
+            <div class="col memberCard">
                 <div class="card h-100" style="padding: 10px;">
                     <img src="https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg"
-                        class="card-img-top bgred" alt="...">
+                        class="cardImg card-img-top bgred" alt="...">
                     <div class="card-body">
                         <!-- 부트스트랩 Table group dividers -->
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th scope="col" colspan="2">
-                                        <h4 class="text-center">Example</h4>
+                                        <h4 class="cardName text-center">Example</h4>
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider">
                                 <tr>
                                     <th style="width: 30%;" scope="row">MBTI</th>
-                                    <td style="width: 70%;">EEEE</td>
+                                    <td class="cardMBTI" style="width: 70%;">EEEE</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">장점</th>
-                                    <td>똑똑함</td>
+                                    <td class="cardMerit">똑똑함</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">협업스타일</th>
-                                    <td>협조적임</td>
+                                    <td class="cardCbst">협조적임</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">블로그주소</th>
-                                    <td><a href="#" class="text-secondary">블로그링크</a></td>
+                                    <td class="cardBlog"><a href="#" class="text-secondary">블로그링크</a></td>
                                 </tr>
                                 <tr>
                                     <th scope="row">깃허브주소</th>
-                                    <td><a href="#" class="text-secondary">깃허브링크</a></td>
+                                    <td class="cardGit"><a href="#" class="text-secondary">깃허브링크</a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -485,8 +513,7 @@
                                 class="btn btn-outline-primary">방명록 쓰기</button>
                             <button id="btnUpdate" type="button" onclick="memberUpdeate()"
                                 class="btn btn-outline-primary">수정</button>
-                            <button id="btnRemove" type="button" onclick="memberDelete()"
-                                class="btn btn-outline-primary">삭제</button>
+                            <button type="button" class="deleteBtn btn btn-outline-primary">삭제</button>
                         </div>
                     </div>
                 </div>
