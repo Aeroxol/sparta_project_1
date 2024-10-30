@@ -183,6 +183,13 @@
       
                             <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
                                 <h2 class="fs-6">방명록</h2>
+                                <div class="card mb-3" style="max-width: 600px;">
+                                    <div id='nocommenttext-${cardId}' class="row g-0">
+                                        <div class="card-body">
+                                            <p id="" class="card-text">방명록이 아직 없습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
@@ -273,11 +280,11 @@
                 $('#addbtn').text('수정하기');
                 $('#postingbox').toggle();
             } else if (action === 'removeBtn') {        //멤버 카드 삭제
-                
+
             } else if (action === 'commentSaveBtn') {      //방명록 저장
                 $(``);
                 let imogi = $(`#commentimogi-${cardId}`).val();
-                if(imogi === null) imogi = '😊';
+                if (imogi === null) imogi = '😊';
                 let comment = $(`#commenttext-${cardId}`).val();
 
                 let temp_html = `
@@ -296,17 +303,20 @@
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
                 $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
                 $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
-                if ($(`#commentWrite-${cardId}`).css("display") == "none") {
+                if ($(`#commentWrite-${cardId}`).css("display") === "none") {
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 } else {
                     $(`#commentBtn-${cardId}`).text('취소');
                 }
+                if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
+                    $(`#nocommenttext-${cardId}`).hide();
+                }
                 //alert('db 저장 후 리로드될 예정');
             }
         });
-        
+
     </script>
-    <script> 
+    <script>
         function memberAdd() {
             $('#postingbox').toggle();
         }
@@ -371,22 +381,22 @@
     <div class="main">
         <div class="p-5 mb-4 bg-body-tertiary rounded-3">
             <div class="container-fluid py-5 text-center">
-<<<<<<< Updated upstream
-                <h1 id="title" class="display-5 fw-bold">팀 9조 이름[need to update]</h1>
-                <p class="fs-4">팀 소개 문구[need to update]</p>
-                <div class="text-end">
-                    <button type="button" id="memberAdd" class="btn btn-primary">멤버 등록</button>
-                </div>
-=======
-                <h1 id="title" class="display-5 fw-bold"><span style="color:crimson;">TEAM<br>VAN THING</span>
-                </h1>
-                <p class="fs-4"><br>팀원도 반토막나고...<br>팀장도 탈주를 하고...<br>제일 안 좋다는 입구자리에 배치됐지만...<br><br>우리는 격하게 서버개발자가 되고
-                    싶다!</p>
+                <<<<<<< Updated upstream <h1 id="title" class="display-5 fw-bold">팀 9조 이름[need to update]</h1>
+                    <p class="fs-4">팀 소개 문구[need to update]</p>
+                    <div class="text-end">
+                        <button type="button" id="memberAdd" class="btn btn-primary">멤버 등록</button>
+                    </div>
+                    =======
+                    <h1 id="title" class="display-5 fw-bold"><span style="color:crimson;">TEAM<br>VAN THING</span>
+                    </h1>
+                    <p class="fs-4"><br>팀원도 반토막나고...<br>팀장도 탈주를 하고...<br>제일 안 좋다는 입구자리에 배치됐지만...<br><br>우리는 격하게 서버개발자가
+                        되고
+                        싶다!</p>
             </div>
             <div class="text-end">
                 <button type="button" onclick="memberAdd()" class="btn btn-primary" style="border: 1px solid white;">멤버
                     등록</button>
->>>>>>> Stashed changes
+                >>>>>>> Stashed changes
             </div>
         </div>
     </div>
@@ -494,14 +504,14 @@
                         <div class="mt-2 p-3 bg-body rounded shadow-sm">
                             <h2 class="fs-6">방명록</h2>
                             <!-- 방명록 템플릿 -->
-                            <div class="card mb-3" style="max-width: 600px;">
+                            <!-- <div class="card mb-3" style="max-width: 600px;">
                                 <div class="row g-0">
                                     <div class="card-body">
                                         <p id="" class="card-text">😊</p>
                                         <p id="" class="card-text">예시로 다는 방명록입니다.</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- 방명록 쓰기 템플릿 -->
