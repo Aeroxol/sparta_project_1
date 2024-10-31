@@ -511,7 +511,7 @@
                 } else {
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
-            }else if(action === 'updateBtn'){
+            } else if (action === 'updateBtn') {
                 let name = $(`#cardName-${cardId}`).text();
                 let mbti = $(`#cardMBTI-${cardId}`).text();
                 let merit = $(`#cardMerit-${cardId}`).text();
@@ -577,7 +577,7 @@
 
         //방명록 등록
         $('#comment-submit').click(async function () {
-            let name = '테스터';
+            let name = $('#comment-name').val();;
             let comment = $('#comment-area').val();
             let now = new Date();
 
@@ -587,8 +587,6 @@
                 timestamp: now
             }
 
-            console.log('댓글 저장');
-            alert('저장완료 ' + now.toString());
             await addDoc(collection(db, "comments"), doc);
             window.location.reload();
         })
@@ -598,8 +596,7 @@
         comments.forEach((doc) => {
             let row = doc.data();
 
-            //let name = row['name'];
-            let name = '영식이';
+            let name = row['name'];
             let comment = row['comment'];
             let timestamp = row.timestamp.toDate();
 
@@ -609,12 +606,11 @@
                         <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                         <div>
                             <!--"작성자 이름  날짜" 및 내용 출력-->
-                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp;<br><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
+                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp;</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
                         </div>
                     </div>
-                    <div class="media-body">
-                        </h5>
-                        <p>${comment}</p>
+                    <div class="media-body" style="position: relative">
+                        <p>${comment}<a style="position: absolute; right:0; margin-right:10px;"><button id="delete-comment" class="btn btn-secondary">삭제</button></a></p>
                     </div>
                 </div>
                 `;
@@ -724,6 +720,7 @@
                         <textarea id='comment-area' class="form-control" rows="3"></textarea>
                     </div>
                     <div style="margin-top: 10px;">
+                        <label>이름 </label><input id="comment-name" type="text">
                         <button id="comment-submit" type="button" class="btn btn-primary">저장</button>
                     </div>
                 </form>
