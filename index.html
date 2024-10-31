@@ -99,7 +99,7 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { doc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { doc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -142,7 +142,7 @@
             let blog = row['blog'];
             let git = row['git'];
 
-            let temp_html = `<div class="col memberCard">
+            let temp_html = `<div class="col memberCard" id="card_${doc.id}">
                     <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
                             class="cardImg card-img-top bgred" alt="...">
@@ -228,46 +228,43 @@
             cardId++;
         });
 
-        $('.deleteBtn').click(async function () {
-            const cards = collection(db, "profiles");
+        $('.deleteBtn').click(deleteCard)
+
+        async function deleteCard() {
             const card = $(this).closest('.memberCard');
-            const name = card.find('.cardName').text();
-            const image = card.find('.cardImg').attr('src');
-            const mbti = card.find('.cardMBTI').text();
-            const merit = card.find('.cardMerit').text();
-            const cbst = card.find('.cardCbst').text();
-            const blog = card.find('.cardBlog').text();
-            const git = card.find('.cardGit').text();
+            let docId = card.attr('id').split('_')[1];
+            const docRef = doc(db, "profiles", docId);
 
-            const q = query(cards,
-                where("name", "==", name),
-                where("image", "==", image),
-                where("mbti", "==", mbti),
-                where("merit", "==", merit),
-                where("cbst", "==", cbst),
-                where("blog", "==", blog),
-                where("git", "==", git)
-            );
-
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.docs.length > 0) {
-                for (const docSnapshot of querySnapshot.docs) {
-                    await deleteDoc(doc(db, "profiles", docSnapshot.id));
-                    console.log(`ID ${docSnapshot.id} deleted`);
-                }
+            try {
+                await deleteDoc(docRef);
+                alert("삭제 완료!");
                 window.location.reload();
+            } catch (error) {
+                console.error(error);
             }
-        })
-
+        }
 
         //멤버 등록 토글 이벤트
         $('#memberAdd').click(async function () {
+            $('#name').val('');
+            $('#mbti').val('');
+            $('#merit').val('');
+            $('#cbst').val('');
+            $('#blog').val('');
+            $('#git').val('');
+            if ($('#addbtn').text() == '등록하기') {
+                $('#postingbox').toggle();
+                return;
+            }
+            $('#addbtn').off('click');
+            $('#addbtn').click(addCard);
             $('#addbtn').text('등록하기');
-            $('#postingbox').toggle();
         });
 
         //멤버 등록 저장 버튼 이벤트
-        $('#addbtn').click(async function () {
+        $('#addbtn').click(addCard);
+
+        async function addCard() {
             let name = $('#name').val();
             // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
             //let image = $('#image').val();  
@@ -290,7 +287,7 @@
             await addDoc(collection(db, "profiles"), doc);
             alert('저장 완료!');
             window.location.reload();
-        });
+        }
 
         //버튼 클릭 이벤트
         $('#cards').on('click', `button`, function () {
@@ -309,8 +306,30 @@
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
             } else if (action === 'updateBtn') {        //멤버 정보 수정
+                const _curCard = $(this).closest('.memberCard');
+                let docId = _curCard.attr('id').split('_')[1];
+                const docRef = doc(db, "profiles", docId);
+
+                let name = _curCard.find($('.cardName')).text();
+                let mbti = _curCard.find($('.cardMBTI')).text();
+                let merit = _curCard.find($('.cardMerit')).text();
+                let cbst = _curCard.find($('.cardCbst')).text();
+                let blog = _curCard.find($('.cardBlog')).text();
+                let git = _curCard.find($('.cardGit')).text();
+
+                $('#name').val(name);
+                $('#mbti').val(mbti);
+                $('#merit').val(merit);
+                $('#cbst').val(cbst);
+                $('#blog').val(blog);
+                $('#git').val(git);
+
                 $('#addbtn').text('수정하기');
-                $('#postingbox').toggle();
+                $('#addbtn').off('click');
+                $('#addbtn').click(() => {
+                    updateCard(docRef);
+                });
+                $('#postingbox').show();
             } else if (action === 'removeBtn') {        //멤버 카드 삭제
 
             } else if (action === 'commentSaveBtn') {      //방명록 저장
@@ -351,6 +370,32 @@
 
             }
         });
+
+        async function updateCard(docRef) {
+            let name = $('#name').val();
+            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
+            //let image = $('#image').val();  
+            let image = '';
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+
+            await setDoc(docRef, doc);
+            alert('수정 완료!');
+            window.location.reload();
+        }
 
     </script>
     <script>
