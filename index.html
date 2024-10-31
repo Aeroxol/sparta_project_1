@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node.js 7기 팀 9조 소개</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
@@ -91,6 +94,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        td {
+            word-wrap:break-word;
         }
     </style>
     <script type="module">
@@ -213,6 +220,10 @@
                         
                             <br>
                             <div class="text-end">
+                                <button id="detailBtn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal-${cardId}">
+                                    자세히
+                                </button>
                                 <button id="commentSaveBtn-${cardId}" type="button"
                                     class="btn btn-outline-primary" style="display:none;">저장</button>
                                 <button id="commentBtn-${cardId}" type="button"
@@ -223,7 +234,68 @@
                             </div>
                         </div>
                     </div>
-                </div>`; // FIXME
+                </div>
+                <!-- 세부정보 -->
+                <div class="modal fade" id="exampleModal-${cardId}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                                                        <img src="${image}"
+                                    class="card-img-top bgred" alt="...">
+                        </div>
+                        <div class="modal-body">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" colspan="2">
+                                            <h4 class="text-center">${name}</h4>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-group-divider">
+                                    <tr>
+                                        <th style="width: 30%;" scope="row">MBTI</th>
+                                        <td style="width: 70%;">${mbti}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">장점</th>
+                                        <td>${merit}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">협업스타일</th>
+                                        <td>${cbst}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">블로그주소</th>
+                                        <td><a href="#" class="text-secondary">${blog}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">깃허브주소</th>
+                                        <td><a href="#" class="text-secondary">${git}</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
+                                <h2 class="fs-6">방명록</h2>
+                                <div class="card mb-3" style="max-width: 600px;">
+                                    <div id='nocommenttext-${cardId}' class="row g-0">
+                                        <div class="card-body">
+                                            <p id="" class="card-text">방명록이 아직 없습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="commentBtn-${cardId}" type="button" class="btn btn-outline-primary">방명록 쓰기</button>
+                            <button id="updateBtn-${cardId}" type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">수정</button>
+                            <button id="deleteBtn-${cardId}" type="button" class="btn btn-outline-primary">삭제</button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">닫기</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                `; // FIXME
             $('#cards').append(temp_html);
             cardId++;
         });
@@ -299,7 +371,7 @@
                 $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
                 $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
-                $(`#removeBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
                 if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
                     $(`#commentBtn-${cardId}`).text('취소');
                 } else {
@@ -332,6 +404,9 @@
                 $('#postingbox').show();
             } else if (action === 'removeBtn') {        //멤버 카드 삭제
 
+                $('#postingbox').toggle();
+            } else if (action === 'deleteBtn') {        //멤버 카드 삭제
+                alert('삭제 기능 구현 필요')
             } else if (action === 'commentSaveBtn') {      //방명록 저장
                 $(``);
                 let imogi = $(`#commentimogi-${cardId}`).val();
@@ -353,7 +428,7 @@
                 $(`#commentSaveBtn-${cardId}`).toggle();                  //저장 버튼 안 보이기
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
                 $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
-                $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
 
                 if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
                     $(`#commentBtn-${cardId}`).text('취소');
@@ -366,7 +441,7 @@
                 $(`#commentimogi-${cardId}`).val('😊');
                 $(`#commenttext-${cardId}`).val('');
                 //alert('db 저장 후 리로드될 예정');
-            } else if (action == - '') {
+            } else if (action == '') {
 
             }
         });
@@ -605,6 +680,10 @@
 
                         <br>
                         <div class="text-end">
+                            <button id="detailBtn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal-1">
+                                자세히
+                            </button>
                             <button id="btnComment" type="button" onclick="memberComment()"
                                 class="btn btn-outline-primary">방명록 쓰기</button>
                             <button id="btnUpdate" type="button" onclick="memberUpdeate()"
@@ -617,6 +696,54 @@
         </div>
     </div>
 
+    <!-- 세부정보 -->
+    <div class="modal fade" id="exampleModal-1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Example</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    세부정보2
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" colspan="2">
+                                    <h4 class="text-center">Example</h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-group-divider">
+                            <tr>
+                                <th style="width: 30%;" scope="row">MBTI</th>
+                                <td style="width: 70%;">EEEE</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">장점</th>
+                                <td>똑똑함</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">협업스타일</th>
+                                <td>협조적임</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">블로그주소</th>
+                                <td><a href="#" class="text-secondary">블로그링크</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">깃허브주소</th>
+                                <td><a href="#" class="text-secondary">깃허브링크</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
