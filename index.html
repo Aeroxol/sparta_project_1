@@ -139,7 +139,7 @@
             let blog = row['blog'];
             let git = row['git'];
 
-            let temp_html = `<div class="col memberCard">
+            let temp_html = `<div class="col memberCard" id="card_${doc.id}">
                     <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
                             class="cardImg card-img-top bgred" alt="...">
@@ -216,31 +216,15 @@
         $('.deleteBtn').click(async function () {
             const cards = collection(db, "profiles");
             const card = $(this).closest('.memberCard');
-            const name = card.find('.cardName').text();
-            const image = card.find('.cardImg').attr('src');
-            const mbti = card.find('.cardMBTI').text();
-            const merit = card.find('.cardMerit').text();
-            const cbst = card.find('.cardCbst').text();
-            const blog = card.find('.cardBlog').text();
-            const git = card.find('.cardGit').text();
+            let docId=card.attr('id').split('_')[1];
 
-            const q = query(cards,
-                where("name", "==", name),
-                where("image", "==", image),
-                where("mbti", "==", mbti),
-                where("merit", "==", merit),
-                where("cbst", "==", cbst),
-                where("blog", "==", blog),
-                where("git", "==", git)
-            );
-
-            const querySnapshot = await getDocs(q);
-            if (querySnapshot.docs.length > 0) {
-                for (const docSnapshot of querySnapshot.docs) {
-                    await deleteDoc(doc(db, "profiles", docSnapshot.id));
-                    console.log(`ID ${docSnapshot.id} deleted`);
-                }
+            const docRef = doc(db, "profiles", docId);
+            try{
+                await deleteDoc(docRef);
+                alert("삭제 완료!");
                 window.location.reload();
+            }catch(error){
+                console.error(error);
             }
         })
 
