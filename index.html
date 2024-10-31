@@ -11,9 +11,6 @@
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
 
@@ -102,7 +99,7 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { doc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { doc, deleteDoc, query, where, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -206,6 +203,7 @@
                                     자세히
                                 </button>
                             </div>
+                                <small class="text-muted">id:${doc.id}</small>
                         </div>
                     </div>
                 </div>
@@ -307,7 +305,7 @@
                                     <div class="input-group mb-3">
                                         <div class="input-group mb-3">
                                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
-                                            <input id="update-name-${cardId}" type="text" class="form-control" style="flex: 4;">
+                                            <input id="update-name" type="text" value="${name}" class="form-control" style="flex: 4;">
                                         </div>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
@@ -370,9 +368,115 @@
             cardId++;
         });
 
-        //$('.deleteBtn').click(deleteCard)
+        //버튼 클릭 이벤트
+        $('#cards').on('click', `button`, function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const cardId = btnId.split('-')[1];
+            const docId = $(`#detailBtn-${cardId}`).closest('.memberCard').data('id');
+
+            console.log('id:'+cardId);
+            console.log(docId);
+            if (action === 'commentBtn') {              //방명록 쓰기
+                $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
+                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
+                $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
+                if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                }
+            } else if (action === 'updateBtn') {               //멤버 카드 수정
+                let name = $(`#cardName-${cardId}`).text();
+                let mbti = $(`#cardMBTI-${cardId}`).text();
+                let merit = $(`#cardMerit-${cardId}`).text();
+                let cbst = $(`#cardCbst-${cardId}`).text();
+                let blog = $(`#cardBlog-${cardId}`).text();
+                let git = $(`#cardGit-${cardId}`).text();
+
+                $(`#update-name`).val(name);
+                $('#update-image').val(image);
+                $('#update-mbti').val(mbti);
+                $('#update-merit').val(merit);
+                $('#update-cbst').val(cbst);
+                $('#update-blog').val(blog);
+                $('#update-git').val(git);
+
+            } else if (action === 'memberUpdateBtn') {        //멤버 카드 수정 저장
+                let name_ = $('#update-name').val();
+                let image_ = $('#update-image').val();
+                let mbti_ = $('#update-mbti').val();
+                let merit_ = $('#update-merit').val();
+                let cbst_ = $('#update-cbst').val();
+                let blog_ = $('#update-blog').val();
+                let git_ = $('#update-git').val();
+
+                const newDoc = {
+                    'name': name_,
+                    'image': image_,
+                    'mbti': mbti_,
+                    'merit': merit_,
+                    'cbst': cbst_,
+                    'blog': blog_,
+                    'git': git_
+                };
+
+                updateCard(docId, newDoc);
+
+            } else if (action === 'deleteBtn') {        //멤버 카드 삭제
+                deleteCard(docId);
+            } else if (action === 'commentSaveBtn') {      //방명록 저장
+                let imogi = $(`#commentimogi-${cardId}`).val();
+                if (imogi === null) imogi = '😊';
+                let comment = $(`#commenttext-${cardId}`).val();
+
+                let temp_html = `
+                            <div class="card mb-3" style="max-width: 600px;">
+                                <div class="row g-0">
+                                    <div class="card-body">
+                                        <p id="" class="card-text">${imogi}</p>
+                                        <p id="" class="card-text">${comment}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+
+                $(`#commentlist-${cardId}`).append(temp_html);          //방명록 리스트에 방명록 추가하기
+                $(`#commentSaveBtn-${cardId}`).toggle();                  //저장 버튼 안 보이기
+                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
+                $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
+
+                if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
+                    $(`#commentBtn-${cardId}`).text('취소');
+                } else {
+                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
+                }
+                if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
+                    $(`#nocommenttext-${cardId}`).hide();
+                }
+                $(`#commentimogi-${cardId}`).val('😊');
+                $(`#commenttext-${cardId}`).val('');
+            }
+        });
+
+        async function updateCard(docId, newDoc) {
+            //firebase db에서 dicID를 가지고있는 문서를 newDoc로 수정
+            const docRef = doc(db, "profiles", docId);
+            try {
+                await updateDoc(docRef, newDoc);
+                alert(docId+" 수정 완료!");
+                window.location.reload();
+            } catch (error) {
+                console.log(docId);
+                console.log(newDoc);
+                console.error(error);
+            }
+        }
 
         async function deleteCard(docId) {
+            //firebase db에서 dicID를 가지고있는 문서를 삭제
             const docRef = doc(db, "profiles", docId);
 
             try {
@@ -384,13 +488,6 @@
             }
         }
 
-        //멤버 등록 토글 이벤트mypostingbox
-        // $('#postingbtn').click(async function () {
-        //     //???
-        //     $('#memberaddBtn').off('click');
-        //     $('#memberaddBtn').click(addCard);
-        //     $('#memberaddBtn').text('등록하기');
-        // });
 
         //멤버 등록 저장 버튼 이벤트
         $('#memberaddBtn').click(addMemberCard);
@@ -427,6 +524,7 @@
             window.location.reload();
         }
 
+        //방명록쓰기(카드)
         async function addComment() {
             let name = $('#commentname').val();
             let comment = $('#commenttext').val();
@@ -445,137 +543,7 @@
             window.location.reload();
         }
 
-        async function updateMemberCard() {
-            const _curCard = $(this).closest('.memberCard').data('id');
-            alert("아이디:" + _curCard);
-            let docId = _curCard.attr('id').split('_')[1];
-            const docRef = doc(db, "profiles", docId);
-
-            let name = _curCard.find($('.update-name')).text();
-            let mbti = _curCard.find($('.update-mbti')).text();
-            let merit = _curCard.find($('.update-merit')).text();
-            let cbst = _curCard.find($('.update-cbst')).text();
-            let blog = _curCard.find($('.update-blog')).text();
-            let git = _curCard.find($('.update-git')).text();
-
-            $(`#update-name-${cardId}`).val(name);
-            $('#mbti').val(mbti);
-            $('#merit').val(merit);
-            $('#cbst').val(cbst);
-            $('#blog').val(blog);
-            $('#git').val(git);
-
-            updateCard(docRef);
-        }
-
-        async function updateCard(docRef, docId) {
-            let name = $('#name').val();
-            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            //let image = $('#image').val();  
-            let image = '';
-            let mbti = $('#mbti').val();
-            let merit = $('#merit').val();
-            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
-            let blog = $('#blog').val();
-            let git = $('#git').val();
-
-            let doc = {
-                'name': name,
-                'image': image,
-                'mbti': mbti,
-                'merit': merit,
-                'cbst': cbst,
-                'blog': blog,
-                'git': git
-            };
-
-            await setDoc(docRef, doc);
-            alert('수정 완료!');
-            window.location.reload();
-        }
-
-        //버튼 클릭 이벤트
-        $('#cards').on('click', `button`, function () {
-            const btnId = $(this).attr('id');
-            const action = btnId.split('-')[0];
-            const cardId = btnId.split('-')[1];
-            const docId = $(`#detailBtn-${cardId}`).closest('.memberCard').data('id');
-
-            if (action === 'commentBtn') {              //방명록 쓰기
-                $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
-                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
-                $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
-                $(`#deleteBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
-                if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
-                    $(`#commentBtn-${cardId}`).text('취소');
-                } else {
-                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
-                }
-            } else if (action === 'updateBtn') {
-                let name = $(`#cardName-${cardId}`).text();
-                let mbti = $(`#cardMBTI-${cardId}`).text();
-                let merit = $(`#cardMerit-${cardId}`).text();
-                let cbst = $(`#cardCbst-${cardId}`).text();
-                let blog = $(`#cardBlog-${cardId}`).text();
-                let git = $(`#cardGit-${cardId}`).text();
-
-                $(`#update-name-${cardId}`).val(name);
-                $('#update-mbti').val(mbti);
-                $('#update-merit').val(merit);
-                $('#update-cbst').val(cbst);
-                $('#update-blog').val(blog);
-                $('#update-git').val(git);
-            } else if (action === 'memberUpdateBtn') {        //멤버 카드 수정
-                //updateMemberCard();
-                // const _curCard = $(this).closest('.memberCard').data('id');
-                // alert("아이디:" + _curCard);
-                // let docId = _curCard.attr('id').split('_')[1];
-                const docRef = doc(db, "profiles", docId);
-                updateCard(docRef, docId);
-
-            } else if (action === 'deleteBtn') {        //멤버 카드 삭제
-                deleteCard(docId);
-            } else if (action === 'commentSaveBtn') {      //방명록 저장
-                let imogi = $(`#commentimogi-${cardId}`).val();
-                if (imogi === null) imogi = '😊';
-                let comment = $(`#commenttext-${cardId}`).val();
-
-                let temp_html = `
-                            <div class="card mb-3" style="max-width: 600px;">
-                                <div class="row g-0">
-                                    <div class="card-body">
-                                        <p id="" class="card-text">${imogi}</p>
-                                        <p id="" class="card-text">${comment}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            `;
-
-                $(`#commentlist-${cardId}`).append(temp_html);          //방명록 리스트에 방명록 추가하기
-                $(`#commentSaveBtn-${cardId}`).toggle();                  //저장 버튼 안 보이기
-                $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
-                $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
-                $(`#deleteBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
-
-                if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
-                    $(`#commentBtn-${cardId}`).text('취소');
-                } else {
-                    $(`#commentBtn-${cardId}`).text('방명록 쓰기');
-                }
-                if ($(`#nocommenttext-${cardId}`).css("display") !== "none") {
-                    $(`#nocommenttext-${cardId}`).hide();
-                }
-                $(`#commentimogi-${cardId}`).val('😊');
-                $(`#commenttext-${cardId}`).val('');
-                //alert('db 저장 후 리로드될 예정');
-            } else if (action == '') {
-
-            }
-        });
-
-
-
-        //방명록 등록
+        //방명록쓰기(전체)
         $('#comment-submit').click(async function () {
             let name = $('#comment-name').val();;
             let comment = $('#comment-area').val();
@@ -586,7 +554,7 @@
                 'comment': comment,
                 timestamp: now
             }
-
+            alert();
             await addDoc(collection(db, "comments"), doc);
             window.location.reload();
         })
@@ -617,22 +585,8 @@
 
             $('#comment-list').append(temp_html);
         });
-
     </script>
     <script>
-        function memberAdd() {
-            $('#postingbox').toggle();
-        }
-        function commentAdd() {
-            $('#postingbox').toggle();
-        }
-
-
-
-        function memberUpdeate() {
-
-        }
-
         // 문서 시작시 날씨 슬라이더 움직이기
         $(document).ready(function () {
             setInterval(function () {
@@ -711,7 +665,7 @@
         </div>
     </div> -->
     <div id="comment-list">
-        <!-- Comments Form -->
+        <!-- 방명록 쓰기 -->
         <div class="card my-4">
             <h5 class="card-header">방명록 남기기</h5>
             <div class="card-body">
