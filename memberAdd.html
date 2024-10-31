@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,149 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-        
+    <script type="module">
+        // Firebase SDK 라이브러리 가져오기
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCpGbwgnF4Wkd6GMVrWpgAAhKzrs8-VKwU",
+            authDomain: "sparta-7d478.firebaseapp.com",
+            projectId: "sparta-7d478",
+            storageBucket: "sparta-7d478.appspot.com",
+            messagingSenderId: "960310847552",
+            appId: "1:960310847552:web:2746efbe54c2d1848ad7a5",
+            measurementId: "G-37CLLVJXC8"
+        };
+
+        // Firebase 인스턴스 초기화
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+        $('#selectFileBtn').click(async function () {
+            console.log('업로드');
+            $('#fileInput').click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            const file = fileInput.files[0];
+            if (file) {
+                $('#image').val(file.name);
+            } else {
+                $('#image').val("선택된 파일 없음");
+            }
+        });
+
+        //멤버 등록 저장 버튼 이벤트
+        $('#addbtn').click(async function () {
+            let name = $('#name').val();
+            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
+            let image = $('#image').val(); 
+            //let image = 'https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg';
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+            await addDoc(collection(db, "profiles"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        });
+
+    </script>
     <style>
+        .mypostingbox {
+            background-color: lightgray;
+            width: 400px;
+            margin: 30px auto 30px auto;
+            padding: 20px;
+            border: 1px solid white;
+            border-radius: 5px;
+        }
+
+        .mypostingbox>button {
+            width: 40%;
+            margin: 0px auto 0px auto;
+        }
     </style>
 </head>
+
 <body>
+    <!-- 등록하기 -->
+    <div class="mypostingbox" id="postingbox">
+        <div>
+            <h3 class="text-center">멤버 등록하기</h3>
+        </div>
+        <hr>
+        <!-- 부트스트랩 input group -->
+        <div class="input-group mb-3">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
+                <input id="name" type="text" class="form-control" style="flex: 4;">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
+                <input type="file" id="fileInput" style="display: none;">
+                <input id="image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기" style="flex: 3;">
+                <button id="selectFileBtn" type="button" class="form-control" style="flex:1;">업로드</button>
+            </div>
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
+            <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
+                <option selected disabled hidden>MBTI 선택</option>
+                <script>
+                    $(document).ready(function () {
+                        let mbti = '';
+                        let mbtiArray = [['E', 'I'], ['N', 'S'], ['F', 'T'], ['J', 'P']];
+                        mbtiArray[0].forEach(e1 => {
+                            mbtiArray[1].forEach(e2 => {
+                                mbtiArray[2].forEach(e3 => {
+                                    mbtiArray[3].forEach(e4 => {
+                                        mbti = e1 + e2 + e3 + e4;
+                                        let mbti_html = `<option value="${mbti}">${mbti}</option>`;
+                                        $('.inputGroupSelect01').append(mbti_html);
+                                    });
+                                });
+                            });
+                        });
+                    })
+                </script>
+            </select>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
+            <input id="merit" type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
+            <input id="cbst" type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
+            <input id="blog" type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
+            <input id="git" type="text" class="form-control" style="flex: 4;">
+        </div>
+        <div class="text-center">
+            <button type="button" class="btn btn-danger" id="addbtn">등록하기</button>
+        </div>
+    </div>
 </body>
+
 </html>
