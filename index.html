@@ -549,6 +549,85 @@
     <div class="membercards">
         <div id="cards" class="row cardwrap row-cols-1 row-cols-md-4 g-4">
             <!-- 카드 템플릿. 멤더 등록시 이 부분에 멤버 카드 추가 -->
+            <div class="col memberCard">
+                <div class="card h-100" style="padding: 10px;">
+                    <img src="https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg"
+                        class="cardImg card-img-top bgred" alt="...">
+                    <div class="card-body">
+                        <!-- 부트스트랩 Table group dividers -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" colspan="2">
+                                        <h4 class="cardName text-center">Example</h4>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-group-divider">
+                                <tr>
+                                    <th style="width: 30%;" scope="row">MBTI</th>
+                                    <td class="cardMBTI" style="width: 70%;">EEEE</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">장점</th>
+                                    <td class="cardMerit">똑똑함</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">협업스타일</th>
+                                    <td class="cardCbst">협조적임</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">블로그주소</th>
+                                    <td class="cardBlog"><a href="#" class="text-secondary">블로그링크</a></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">깃허브주소</th>
+                                    <td class="cardGit"><a href="#" class="text-secondary">깃허브링크</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-2 p-3 bg-body rounded shadow-sm">
+                            <h2 class="fs-6">방명록</h2>
+                            <!-- 방명록 템플릿 -->
+                            <!-- <div class="card mb-3" style="max-width: 600px;">
+                                <div class="row g-0">
+                                    <div class="card-body">
+                                        <p id="" class="card-text">😊</p>
+                                        <p id="" class="card-text">예시로 다는 방명록입니다.</p>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <!-- 방명록 쓰기 템플릿 -->
+                        <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
+                            <h2 class="fs-6">방명록 쓰기</h2>
+                            <div class="input-group mb-3">
+                                <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                    <option selected disabled hidden>😊</option>
+                                    <option value="😊">😊</option>
+                                    <option value="😍">😍</option>
+                                    <option value="🤔">🤔</option>
+                                    <option value="😒">😒</option>
+                                    <option value="😭">😭</option>
+                                    <option value="😨">😨</option>
+                                    <option value="😵">😵</option>
+                                </select>
+                                <input id="" class="form-control" type="text" style="flex: 9;">
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="text-end">
+                            <button id="btnComment" type="button" onclick="memberComment()"
+                                class="btn btn-outline-primary">방명록 쓰기</button>
+                            <button id="btnUpdate" type="button" onclick="memberUpdeate()"
+                                class="btn btn-outline-primary">수정</button>
+                            <button type="button" class="deleteBtn btn btn-outline-primary">삭제</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
