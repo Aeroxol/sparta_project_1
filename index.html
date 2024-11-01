@@ -117,10 +117,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        $('#selectFileBtn').click(async function () {
-            console.log('업로드');
-            $('#fileInput').click();
-        });
+        // $('#selectFileBtn').click(async function () {
+        //     console.log('업로드');
+        //     $('#fileInput').click();
+        // });
 
         // 오류남
         // fileInput.addEventListener('change', function () {
@@ -162,7 +162,7 @@
                 <div class="col memberCard" id="card_${doc.id}" data-id="${doc.id}">
                     <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
-                            class="cardImg card-img-top bgred" alt="...">
+                            class="cardImg card-img-top" alt="...">
                         <div class="card-body">
     
                             <table class="table">
@@ -203,7 +203,6 @@
                                     자세히
                                 </button>
                             </div>
-                                <small class="text-muted">id:${doc.id}</small>
                         </div>
                     </div>
                 </div>
@@ -305,37 +304,37 @@
                                     <div class="input-group mb-3">
                                         <div class="input-group mb-3">
                                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
-                                            <input id="update-name" type="text" value="${name}" class="form-control" style="flex: 4;">
+                                            <input id="update-name-${cardId}" type="text" value="${name}" class="form-control" style="flex: 4;">
                                         </div>
                                         <div class="input-group mb-3">
                                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
                                             <input type="file" id="update-fileInput" style="display: none;">
-                                            <input id="update-image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
+                                            <input id="update-image-${cardId}" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
                                                 style="flex: 3;">
                                             <button id="selectFileBtn" type="button" class="form-control"
-                                                style="flex:1;">업로드</button>
+                                                style="flex:1;" disabled="diabled">업로드</button>
                                             <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
                                         </div>
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
-                                        <select class="form-select inputGroupSelect01-${cardId}" id="update-mbti" style="flex: 4;">
+                                        <select class="form-select inputGroupSelect01-${cardId}" id="update-mbti-${cardId}" style="flex: 4;">
                                             <option selected disabled hidden>MBTI 선택</option>
                                         </select>
                                     </div>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
-                                        <input id="update-merit" type="text" value="${merit}" class="form-control" style="flex: 4;">
+                                        <input id="update-merit-${cardId}" type="text" value="${merit}" class="form-control" style="flex: 4;">
                                     </div>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
-                                        <input id="update-cbst" type="text" value="${cbst}" class="form-control" style="flex: 4;">
+                                        <input id="update-cbst-${cardId}" type="text" value="${cbst}" class="form-control" style="flex: 4;">
                                     </div>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
-                                        <input id="update-blog" type="text" value="${blog}" class="form-control" style="flex: 4;">
+                                        <input id="update-blog-${cardId}" type="text" value="${blog}" class="form-control" style="flex: 4;">
                                     </div>
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
-                                        <input id="update-git" type="text" value="${git}" class="form-control" style="flex: 4;">
+                                        <input id="update-git-${cardId}" type="text" value="${git}" class="form-control" style="flex: 4;">
                                     </div>
                                     <br>
                                     <div class="text-center">
@@ -397,24 +396,24 @@
                 let blog = $(`#cardBlog-${cardId}`).text();
                 let git = $(`#cardGit-${cardId}`).text();
 
-                $(`#update-name`).val(name);
-                $('#update-image').val(image);
-                $('#update-mbti').val(mbti);
-                $('#update-merit').val(merit);
-                $('#update-cbst').val(cbst);
-                $('#update-blog').val(blog);
-                $('#update-git').val(git);
+                $(`#update-name-${cardId}`).val(name);
+                $(`#update-image-${cardId}`).val(image);
+                $(`#update-mbti-${cardId}`).val(mbti);
+                $(`#update-merit-${cardId}`).val(merit);
+                $(`#update-cbst-${cardId}`).val(cbst);
+                $(`#update-blog-${cardId}`).val(blog);
+                $(`#update-git-${cardId}`).val(git);
 
             } else if (action === 'memberUpdateBtn') {        //멤버 카드 수정 저장
                 const docId = $(`#updatemodal-${cardId}`).data('doc-id');
 
-                let name_ = $('#update-name').val();
-                let image_ = $('#update-image').val();
-                let mbti_ = $('#update-mbti').val();
-                let merit_ = $('#update-merit').val();
-                let cbst_ = $('#update-cbst').val();
-                let blog_ = $('#update-blog').val();
-                let git_ = $('#update-git').val();
+                let name_ = $(`#update-name-${cardId}`).val();
+                let image_ = $(`#update-image-${cardId}`).val();
+                let mbti_ = $(`#update-mbti-${cardId}`).val();
+                let merit_ = $(`#update-merit-${cardId}`).val();
+                let cbst_ = $(`#update-cbst-${cardId}`).val();
+                let blog_ = $(`#update-blog-${cardId}`).val();
+                let git_ = $(`#update-git-${cardId}`).val();
 
                 const newDoc = {
                     'name': name_,
@@ -425,7 +424,7 @@
                     'blog': blog_,
                     'git': git_
                 };
-
+                console.log("newDoc", newDoc);
                 updateCard(docId, newDoc);
 
             } else if (action === 'deleteBtn') {        //멤버 카드 삭제
@@ -471,10 +470,9 @@
             try {
                 await updateDoc(docRef, newDoc);
                 alert(docId+" 수정 완료!");
+                console.log(newDoc);
                 window.location.reload();
             } catch (error) {
-                console.log('수정 문서 ID : '+docId);
-                console.log(newDoc);
                 console.error(error);
             }
         }
@@ -492,21 +490,34 @@
             }
         }
 
+        async function deleteComment(docId) {
+            //firebase db에서 dicID를 가지고있는 문서를 삭제
+            const docRef = doc(db, "comments", docId);
 
-        //멤버 등록 저장 버튼 이벤트
+            try {
+                await deleteDoc(docRef);
+                alert("삭제 완료!");
+                window.location.reload();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+        //메인화면 멤버 등록 저장 버튼 이벤트
         $('#memberaddBtn').click(addMemberCard);
 
         async function addMemberCard() {
             let name = $('#name').val();
             // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            let image;
-            let file;
+            let image = $('#image').val();
+            //let file;
             try {
-                file = $('file').val();
+                //file = $('file').val();
                 //file이 null이 아니면 업로드 후 url 내려받고 image에 저장
-                image = file.url;
+                //image = file.url;
             } catch (error) {
-                image = $('#image').val();
+                //image = $('#image').val();
             }
             let mbti = $('#mbti').val();
             let merit = $('#merit').val();
@@ -563,7 +574,17 @@
             window.location.reload();
         })
 
+        //방명록삭제(전체)
+        $('#comment-list').on('click', 'button', async function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const commentId = btnId.split('-')[2];
+            const docId = $(this).closest(`#comment-${commentId}`).data('id');
+            deleteComment(docId);
+        })
+
         //방명록 로드
+        let commentId = 1;
         let comments = await getDocs(collection(db, "comments"));
         comments.forEach((doc) => {
             let row = doc.data();
@@ -573,21 +594,22 @@
             let timestamp = row.timestamp.toDate();
 
             let temp_html = `
-                <div class="media mb-4" id="comment" style="margin-left:20px">
+                <div class="media mb-4" id="comment-${commentId}" data-id="${doc.id}" style="margin-left:20px">
                     <div style="display: flex; ">
                         <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                         <div>
                             <!--"작성자 이름  날짜" 및 내용 출력-->
-                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp;</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
+                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp; ${doc.id}</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
                         </div>
                     </div>
                     <div class="media-body" style="position: relative">
-                        <p>${comment}<a style="position: absolute; right:0; margin-right:10px;"><button id="delete-comment" class="btn btn-secondary">삭제</button></a></p>
+                        <p>${comment}<a style="position: absolute; right:0; margin-right:10px;"><button id="delete-comment-${commentId}" class="btn btn-secondary">삭제</button></a></p>
                     </div>
                 </div>
                 `;
 
             $('#comment-list').append(temp_html);
+            commentId++;
         });
     </script>
     <script>
@@ -729,7 +751,7 @@
                                 <input id="image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
                                     style="flex: 3;">
                                 <button id="selectFileBtn" type="button" class="form-control"
-                                    style="flex:1;">업로드</button>
+                                    style="flex:1;" disabled="disabled">업로드</button>
                                 <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
                             </div>
                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
