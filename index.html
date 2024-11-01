@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Node.js 7기 팀 9조 소개</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Pen+Script&display=swap');
 
@@ -73,6 +73,10 @@
             border: 1px solid white;
             border-radius: 5px;
         }
+        .mypostingbox>button {
+            width: 40%;
+            margin: 0px auto 0px auto;
+        }
 
         /* 날씨 슬라이더를 위한 css */
         .weatherSlider {
@@ -99,7 +103,7 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
+        import { doc, deleteDoc, query, where, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
@@ -115,6 +119,22 @@
         // Firebase 인스턴스 초기화
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        $('#selectFileBtn').click(async function () {
+            console.log('업로드');
+            $('#fileInput').click();
+        });
+
+        // 오류남
+        // fileInput.addEventListener('change', function () {
+        //     const file = fileInput.files[0];
+        //     if (file) {
+        //         $('#image').val(file.name);
+        //         console.log("dd");
+        //     } else {
+        //         $('#image').val("선택된 파일 없음");
+        //     }
+        // });
 
         //db에서 멤버 카드 불러오기
         let cardId = 1;
@@ -141,123 +161,213 @@
             let blog = row['blog'];
             let git = row['git'];
 
-            let temp_html = `<div class="col">
+            let temp_html = `
+                <div class="col memberCard" id="card_${doc.id}" data-id="${doc.id}">
                     <div id="card-${cardId}" class="card h-100" style="padding: 10px;">
                         <img src="${image}"
-                            class="card-img-top bgred" alt="...">
+                            class="cardImg card-img-top" alt="...">
                         <div class="card-body">
     
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th scope="col" colspan="2">
-                                            <h4 class="text-center">${name}</h4>
+                                            <h4 id="cardName-${cardId}" class="cardName text-center">${name}</h4>
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-group-divider">
                                     <tr>
                                         <th style="width: 30%;" scope="row">MBTI</th>
-                                        <td style="width: 70%;">${mbti}</td>
+                                        <td id="cardMBTI-${cardId}" class="cardMBTI" style="width: 70%;">${mbti}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">장점</th>
-                                        <td>${merit}</td>
+                                        <td id="cardMerit-${cardId}" class="cardMerit">${merit}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">협업스타일</th>
-                                        <td>${cbst}</td>
+                                        <td id="cardCbst-${cardId}" class="cardCbst">${cbst}</td>
                                     </tr>
                                     <tr>
                                         <th scope="row">블로그주소</th>
-                                        <td><a href="#" class="text-secondary">${blog}</a></td>
+                                        <td id="cardBlog-${cardId}" class="cardBlog"><a href="${blog}" class="text-secondary">${blog}</a></td>
                                     </tr>
                                     <tr>
                                         <th scope="row">깃허브주소</th>
-                                        <td><a href="#" class="text-secondary">${git}</a></td>
+                                        <td id="cardGit-${cardId}" class="cardGit"><a href="${git}" class="text-secondary">${git}</a></td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <div class="mt-2 p-3 bg-body rounded shadow-sm">
-                            </div>
-      
-                            <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
-                                <h2 class="fs-6">방명록</h2>
-                                <div class="card mb-3" style="max-width: 600px;">
-                                    <div id='nocommenttext-${cardId}' class="row g-0">
-                                        <div class="card-body">
-                                            <p id="" class="card-text">방명록이 아직 없습니다.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
-                                <h2 class="fs-6">방명록 쓰기</h2>
-                                <div class="input-group mb-3">
-                                    <select id='commentimogi-${cardId}' class="form-select" id="inputGroupSelect01" style="flex: 1;">
-                                        <option selected disabled hidden>😊</option>
-                                        <option value="😊">😊</option>
-                                        <option value="😍">😍</option>
-                                        <option value="🤔">🤔</option>
-                                        <option value="😒">😒</option>
-                                        <option value="😭">😭</option>
-                                        <option value="😨">😨</option>
-                                        <option value="😵">😵</option>
-                                    </select>
-                                    <input id="commenttext-${cardId}" class="form-control" type="text" style="flex: 9;">
-                                </div>
-                            </div>
-
-                        
                             <br>
                             <div class="text-end">
-                                <button id="commentSaveBtn-${cardId}" type="button"
-                                    class="btn btn-outline-primary" style="display:none;">저장</button>
-                                <button id="commentBtn-${cardId}" type="button"
-                                    class="btn btn-outline-primary">방명록 쓰기</button>
-                                <button id="updateBtn-${cardId}" type="button" onclick="memberUpdeate()"
-                                    class="btn btn-outline-primary">수정</button>
-                                <button id="removeBtn-${cardId}" type="button" onclick="memberDelete()"
-                                    class="btn btn-outline-primary">삭제</button>
+                                <button id="detailBtn-${cardId}" type="button" class="btn btn-outline-primary detailBtn" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal-${cardId}">
+                                    자세히
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>`; // FIXME
+                </div>
+                <!-- 세부정보창 -->
+                <div class="modal fade" id="exampleModal-${cardId}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                                            <img src="${image}"
+                                        class="card-img-top bgred" alt="...">
+                            </div>
+                            <div class="modal-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" colspan="2">
+                                                <h4 class="text-center">${name}</h4>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider">
+                                        <tr>
+                                            <th style="width: 30%;" scope="row">MBTI</th>
+                                            <td style="width: 70%;">${mbti}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">장점</th>
+                                            <td>${merit}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">협업스타일</th>
+                                            <td>${cbst}</td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">블로그주소</th>
+                                            <td><a href="#" class="text-secondary">${blog}</a></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">깃허브주소</th>
+                                            <td><a href="#" class="text-secondary">${git}</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
+                                    <h2 class="fs-6">방명록</h2>
+                                    <div class="card mb-3" style="max-width: 600px;">
+                                        <div id='nocommenttext-${cardId}' class="row g-0">
+                                            <div class="card-body">
+                                                <p id="" class="card-text">방명록이 아직 없습니다.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
+                                    <h2 class="fs-6">방명록 쓰기</h2>
+                                    <div class="input-group mb-3">
+                                        <select id='commentimogi-${cardId}' class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                                            <option selected disabled hidden>😊</option>
+                                            <option value="😊">😊</option>
+                                            <option value="😍">😍</option>
+                                            <option value="🤔">🤔</option>
+                                            <option value="😒">😒</option>
+                                            <option value="😭">😭</option>
+                                            <option value="😨">😨</option>
+                                            <option value="😵">😵</option>
+                                        </select>
+                                        <input id="commenttext-${cardId}" class="form-control" type="text" style="flex: 9;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="commentSaveBtn-${cardId}" type="button" class="btn btn-outline-primary" style="display: none;">저장</button>
+                                <button id="commentBtn-${cardId}" type="button" class="btn btn-outline-primary">방명록 쓰기</button>
+                                <button id="updateBtn-${cardId}" type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                                    data-bs-target="#updatemodal-${cardId}">수정</button>
+                                <button id="deleteBtn-${cardId}" type="button" class="btn btn-outline-primary">삭제</button>
+                                <button id="btn-" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">닫기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 멤버수정창 -->
+                <div class="modal fade" id="updatemodal-${cardId}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3></h3><span class="text-center">
+                                    <h3>멤버 수정하기</h3>
+                                </span>
+                                <h3></h3>
+                            </div>
+                            <div class="modal-body">
+                                <!-- 등록하기 -->
+                                <div class="mypostingbox" id="postingbox">
+                                    <div>
+                                    </div>
+                                    <!-- 부트스트랩 input group -->
+                                    <div class="input-group mb-3">
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
+                                            <input id="update-name-${cardId}" type="text" value="${name}" class="form-control" style="flex: 4;">
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
+                                            <input type="file" id="update-fileInput" style="display: none;">
+                                            <input id="update-image-${cardId}" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
+                                                style="flex: 3;">
+                                            <button id="selectFileBtn" type="button" class="form-control"
+                                                style="flex:1;">업로드</button>
+                                            <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
+                                        </div>
+                                        <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
+                                        <select class="form-select inputGroupSelect01-${cardId}" id="update-mbti-${cardId}" style="flex: 4;">
+                                            <option selected disabled hidden>MBTI 선택</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
+                                        <input id="update-merit-${cardId}" type="text" value="${merit}" class="form-control" style="flex: 4;">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
+                                        <input id="update-cbst-${cardId}" type="text" value="${cbst}" class="form-control" style="flex: 4;">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
+                                        <input id="update-blog-${cardId}" type="text" value="${blog}" class="form-control" style="flex: 4;">
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
+                                        <input id="update-git-${cardId}" type="text" value="${git}" class="form-control" style="flex: 4;">
+                                    </div>
+                                    <br>
+                                    <div class="text-center">
+                                        <button id="memberUpdateBtn-${cardId}" type="button" class="btn btn-danger">수정하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="btn-" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">닫기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `; // FIXME
             $('#cards').append(temp_html);
+
+            let mbti_ = '';
+            let mbtiArray = [['E', 'I'], ['N', 'S'], ['F', 'T'], ['J', 'P']];
+            mbtiArray[0].forEach(e1 => {
+                mbtiArray[1].forEach(e2 => {
+                    mbtiArray[2].forEach(e3 => {
+                        mbtiArray[3].forEach(e4 => {
+                            mbti_ = e1 + e2 + e3 + e4;
+                            let mbti_html = `<option value="${mbti_}">${mbti_}</option>`;
+                            $(`.inputGroupSelect01-${cardId}`).append(mbti_html);
+                        });
+                    });
+                });
+            });
             cardId++;
-        });
-
-        //멤버 등록 토글 이벤트
-        $('#memberAdd').click(async function () {
-            $('#addbtn').text('등록하기');
-            $('#postingbox').toggle();
-        });
-
-        //멤버 등록 저장 버튼 이벤트
-        $('#addbtn').click(async function () {
-            let name = $('#name').val();
-            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            //let image = $('#image').val();  
-            let image = '';
-            let mbti = $('#mbti').val();
-            let merit = $('#merit').val();
-            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
-            let blog = $('#blog').val();
-            let git = $('#git').val();
-
-            let doc = {
-                'name': name,
-                'image': image,
-                'mbti': mbti,
-                'merit': merit,
-                'cbst': cbst,
-                'blog': blog,
-                'git': git
-            };
-            await addDoc(collection(db, "profiles"), doc);
-            alert('저장 완료!');
-            window.location.reload();
         });
 
         //버튼 클릭 이벤트
@@ -265,24 +375,64 @@
             const btnId = $(this).attr('id');
             const action = btnId.split('-')[0];
             const cardId = btnId.split('-')[1];
+            const docId = $(`#detailBtn-${cardId}`).closest('.memberCard').data('id');
+            console.log(docId);
 
+            console.log('id:'+cardId);
             if (action === 'commentBtn') {              //방명록 쓰기
                 $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
                 $(`#updateBtn-${cardId}`).toggle();                     //수정 버튼 안 보이기
-                $(`#removeBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                     //삭제 버튼 안 보이기
                 if ($(`#commentBtn-${cardId}`).text() === '방명록 쓰기') {
                     $(`#commentBtn-${cardId}`).text('취소');
                 } else {
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
-            } else if (action === 'updateBtn') {        //멤버 정보 수정
-                $('#addbtn').text('수정하기');
-                $('#postingbox').toggle();
-            } else if (action === 'removeBtn') {        //멤버 카드 삭제
+            } else if (action === 'updateBtn') {               //멤버 카드 수정
+                $(`#updatemodal-${cardId}`).data('doc-id', docId);
 
+                let name = $(`#cardName-${cardId}`).text();
+                let mbti = $(`#cardMBTI-${cardId}`).text();
+                let merit = $(`#cardMerit-${cardId}`).text();
+                let cbst = $(`#cardCbst-${cardId}`).text();
+                let blog = $(`#cardBlog-${cardId}`).text();
+                let git = $(`#cardGit-${cardId}`).text();
+
+                $(`#update-name-${cardId}`).val(name);
+                $(`#update-image-${cardId}`).val(image);
+                $(`#update-mbti-${cardId}`).val(mbti);
+                $(`#update-merit-${cardId}`).val(merit);
+                $(`#update-cbst-${cardId}`).val(cbst);
+                $(`#update-blog-${cardId}`).val(blog);
+                $(`#update-git-${cardId}`).val(git);
+
+            } else if (action === 'memberUpdateBtn') {        //멤버 카드 수정 저장
+                const docId = $(`#updatemodal-${cardId}`).data('doc-id');
+
+                let name_ = $(`#update-name-${cardId}`).val();
+                let image_ = $(`#update-image-${cardId}`).val();
+                let mbti_ = $(`#update-mbti-${cardId}`).val();
+                let merit_ = $(`#update-merit-${cardId}`).val();
+                let cbst_ = $(`#update-cbst-${cardId}`).val();
+                let blog_ = $(`#update-blog-${cardId}`).val();
+                let git_ = $(`#update-git-${cardId}`).val();
+
+                const newDoc = {
+                    'name': name_,
+                    'image': image_,
+                    'mbti': mbti_,
+                    'merit': merit_,
+                    'cbst': cbst_,
+                    'blog': blog_,
+                    'git': git_
+                };
+                console.log("newDoc", newDoc);
+                updateCard(docId, newDoc);
+
+            } else if (action === 'deleteBtn') {        //멤버 카드 삭제
+                deleteCard(docId);
             } else if (action === 'commentSaveBtn') {      //방명록 저장
-                $(``);
                 let imogi = $(`#commentimogi-${cardId}`).val();
                 if (imogi === null) imogi = '😊';
                 let comment = $(`#commenttext-${cardId}`).val();
@@ -302,7 +452,7 @@
                 $(`#commentSaveBtn-${cardId}`).toggle();                  //저장 버튼 안 보이기
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 안 보이기
                 $(`#updateBtn-${cardId}`).toggle();                  //수정 버튼 보이기
-                $(`#removeBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
+                $(`#deleteBtn-${cardId}`).toggle();                  //삭제 버튼 보이기
 
                 if ($(`#commentBtn-${cardId}`).text() === "방명록 쓰기") {
                     $(`#commentBtn-${cardId}`).text('취소');
@@ -314,31 +464,156 @@
                 }
                 $(`#commentimogi-${cardId}`).val('😊');
                 $(`#commenttext-${cardId}`).val('');
-                //alert('db 저장 후 리로드될 예정');
-            } else if (action == - '') {
-
             }
         });
 
+        async function updateCard(docId, newDoc) {
+            //firebase db에서 dicID를 가지고있는 문서를 newDoc로 수정
+            const docRef = doc(db, "profiles", docId);
+            try {
+                await updateDoc(docRef, newDoc);
+                alert(docId+" 수정 완료!");
+                console.log(newDoc);
+                window.location.reload();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function deleteCard(docId) {
+            //firebase db에서 dicID를 가지고있는 문서를 삭제
+            const docRef = doc(db, "profiles", docId);
+
+            try {
+                await deleteDoc(docRef);
+                alert("삭제 완료!");
+                window.location.reload();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function deleteComment(docId) {
+            //firebase db에서 dicID를 가지고있는 문서를 삭제
+            const docRef = doc(db, "comments", docId);
+
+            try {
+                await deleteDoc(docRef);
+                alert("삭제 완료!");
+                window.location.reload();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+        //메인화면 멤버 등록 저장 버튼 이벤트
+        $('#memberaddBtn').click(addMemberCard);
+
+        async function addMemberCard() {
+            let name = $('#name').val();
+            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
+            let image = $('#image').val();
+            let file;
+            try {
+                file = $('file').val();
+                //file이 null이 아니면 업로드 후 url 내려받고 image에 저장
+                image = file.url;
+            } catch (error) {
+                image = $('#image').val();
+            }
+            let mbti = $('#mbti').val();
+            let merit = $('#merit').val();
+            let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
+            let blog = $('#blog').val();
+            let git = $('#git').val();
+
+            let doc = {
+                'name': name,
+                'image': image,
+                'mbti': mbti,
+                'merit': merit,
+                'cbst': cbst,
+                'blog': blog,
+                'git': git
+            };
+            await addDoc(collection(db, "profiles"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        }
+
+        //방명록쓰기(카드)
+        async function addComment() {
+            let name = $('#commentname').val();
+            let comment = $('#commenttext').val();
+            let writeTime = $('#merit').val();
+            let imogi = $('#commentimogi').val();
+
+            let doc = {
+                'name': name,
+                'imogi': imogi,
+                'comment': comment,
+                'writeTime': writeTime,
+            };
+            await addDoc(collection(db, "comments"), doc);
+            alert('저장 완료!');
+            window.location.reload();
+        }
+
+        //방명록쓰기(전체)
+        $('#comment-submit').click(async function () {
+            let name = $('#comment-name').val();;
+            let comment = $('#comment-area').val();
+            let now = new Date();
+
+            let doc = {
+                'name': name,
+                'comment': comment,
+                timestamp: now
+            }
+            await addDoc(collection(db, "comments"), doc);
+            window.location.reload();
+        })
+
+        //방명록삭제(전체)
+        $('#comment-list').on('click', 'button', async function () {
+            const btnId = $(this).attr('id');
+            const action = btnId.split('-')[0];
+            const commentId = btnId.split('-')[2];
+            const docId = $(this).closest(`#comment-${commentId}`).data('id');
+            deleteComment(docId);
+        })
+
+        //방명록 로드
+        let commentId = 1;
+        let comments = await getDocs(collection(db, "comments"));
+        comments.forEach((doc) => {
+            let row = doc.data();
+
+            let name = row['name'];
+            let comment = row['comment'];
+            let timestamp = row.timestamp.toDate();
+
+            let temp_html = `
+                <div class="media mb-4" id="comment-${commentId}" data-id="${doc.id}" style="margin-left:20px">
+                    <div style="display: flex; ">
+                        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                        <div>
+                            <!--"작성자 이름  날짜" 및 내용 출력-->
+                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp;</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
+                        </div>
+                    </div>
+                    <div class="media-body" style="position: relative">
+                        <p>${comment}<a style="position: absolute; right:0; margin-right:10px;"><button id="delete-comment-${commentId}" class="btn btn-secondary">삭제</button></a></p>
+                    </div>
+                </div>
+                `;
+
+            $('#comment-list').append(temp_html);
+            commentId++;
+        });
     </script>
     <script>
-        function memberAdd() {
-            $('#postingbox').toggle();
-        }
-        function commentAdd() {
-            $('#postingbox').toggle();
-        }
-
-
-
-        function memberUpdeate() {
-
-        }
-
-        function memberDelete() {
-
-        }
-
         // 문서 시작시 날씨 슬라이더 움직이기
         $(document).ready(function () {
             setInterval(function () {
@@ -393,158 +668,143 @@
                     싶다!</p>
             </div>
             <div class="text-end">
-                <button type="button" onclick="memberAdd()" class="btn btn-primary" style="border: 1px solid white;">멤버
-                    등록</button>
+                <button type="button" class="btn btn-primary" style="border: 1px solid white;" data-bs-toggle="modal"
+                    data-bs-target="#posingmodal">멤버 등록</button>
             </div>
-        </div>
-    </div>
-
-    <!-- 등록하기 -->
-    <div class="mypostingbox" id="postingbox" style="display: none;">
-        <div>
-            <h3 class="text-center">멤버 등록하기</h3>
-        </div>
-        <hr>
-        <!-- 부트스트랩 input group -->
-        <div class="input-group mb-3">
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
-                <input id="name" type="text" class="form-control" style="flex: 4;">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
-                <input id="image-upload" type="file" class="form-control" style="flex:4;">
-                <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
-            </div>
-            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
-            <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
-                <option selected disabled hidden>MBTI 선택</option>
-                <script>
-                    $(document).ready(function () {
-                        let mbti = '';
-                        let mbtiArray = [['E', 'I'], ['N', 'S'], ['F', 'T'], ['J', 'P']];
-                        mbtiArray[0].forEach(e1 => {
-                            mbtiArray[1].forEach(e2 => {
-                                mbtiArray[2].forEach(e3 => {
-                                    mbtiArray[3].forEach(e4 => {
-                                        mbti = e1 + e2 + e3 + e4;
-                                        let mbti_html = `<option value="${mbti}">${mbti}</option>`;
-                                        $('.inputGroupSelect01').append(mbti_html);
-                                    });
-                                });
-                            });
-                        });
-                    })
-                </script>
-            </select>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
-            <input id="merit" type="text" class="form-control" style="flex: 4;">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
-            <input id="cbst" type="text" class="form-control" style="flex: 4;">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
-            <input id="blog" type="text" class="form-control" style="flex: 4;">
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
-            <input id="git" type="text" class="form-control" style="flex: 4;">
-        </div>
-        <div class="text-center">
-            <button type="button" class="btn btn-danger" id="addbtn">등록하기</button>
         </div>
     </div>
 
     <div class="membercards">
         <div id="cards" class="row cardwrap row-cols-1 row-cols-md-4 g-4">
             <!-- 카드 템플릿. 멤더 등록시 이 부분에 멤버 카드 추가 -->
-            <div class="col">
-                <div class="card h-100" style="padding: 10px;">
-                    <img src="https://movie-phinf.pstatic.net/20210728_221/1627440327667GyoYj_JPEG/movie_image.jpg"
-                        class="card-img-top bgred" alt="...">
-                    <div class="card-body">
-                        <!-- 부트스트랩 Table group dividers -->
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col" colspan="2">
-                                        <h4 class="text-center">Example</h4>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-group-divider">
-                                <tr>
-                                    <th style="width: 30%;" scope="row">MBTI</th>
-                                    <td style="width: 70%;">EEEE</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">장점</th>
-                                    <td>똑똑함</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">협업스타일</th>
-                                    <td>협조적임</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">블로그주소</th>
-                                    <td><a href="#" class="text-secondary">블로그링크</a></td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">깃허브주소</th>
-                                    <td><a href="#" class="text-secondary">깃허브링크</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="mt-2 p-3 bg-body rounded shadow-sm">
-                            <h2 class="fs-6">방명록</h2>
-                            <!-- 방명록 템플릿 -->
-                            <!-- <div class="card mb-3" style="max-width: 600px;">
-                                <div class="row g-0">
-                                    <div class="card-body">
-                                        <p id="" class="card-text">😊</p>
-                                        <p id="" class="card-text">예시로 다는 방명록입니다.</p>
-                                    </div>
-                                </div>
-                            </div> -->
-                        </div>
+        </div>
+    </div>
 
-                        <!-- 방명록 쓰기 템플릿 -->
-                        <div id="commentWrite" class="mt-2 p-3 bg-body rounded shadow-sm" style="display: none;">
-                            <h2 class="fs-6">방명록 쓰기</h2>
+    <hr>
+    <!-- <div id="commentlist" class="mt-2 p-3 bg-body rounded shadow-sm">
+        <h2 class="text-center">방명록</h2>
+        <div class="card mb-3" style="max-width: 800px; display: flex; justify-content: center; flex-direction: column;">
+            <div id='nocommenttext-${cardId}' class="row g-0 tex">
+                <div class="card-body">
+                    <p id="" class="card-text text-center">방명록이 아직 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div id="comment-list">
+        <!-- 방명록 쓰기 -->
+        <div class="card my-4">
+            <h5 class="card-header">방명록 남기기</h5>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <textarea id='comment-area' class="form-control" rows="3"></textarea>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label>이름 </label><input id="comment-name" type="text">
+                        <button id="comment-submit" type="button" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- <div id="commentWrite-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm commentWrite" style="display: none;">
+        <h2 class="fs-6">방명록 쓰기</h2>
+        <div class="input-group mb-3">
+            <select id='commentimogi-${cardId}' class="form-select" id="inputGroupSelect01" style="flex: 1;">
+                <option selected disabled hidden>😊</option>
+                <option value="😊">😊</option>
+                <option value="😍">😍</option>
+                <option value="🤔">🤔</option>
+                <option value="😒">😒</option>
+                <option value="😭">😭</option>
+                <option value="😨">😨</option>
+                <option value="😵">😵</option>
+            </select>
+            <input id="commenttext-${cardId}" class="form-control" type="text" style="flex: 9;">
+        </div>
+    </div> -->
+
+    <!-- 멤버등록창 -->
+    <div class="modal fade" id="posingmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3></h3><span class="text-center">
+                        <h3>멤버 등록하기</h3>
+                    </span>
+                    <h3></h3>
+                </div>
+                <div class="modal-body">
+                    <!-- 등록하기 -->
+                    <div class="mypostingbox" id="postingbox">
+                        <div>
+                        </div>
+                        <!-- 부트스트랩 input group -->
+                        <div class="input-group mb-3">
                             <div class="input-group mb-3">
-                                <select class="form-select" id="inputGroupSelect01" style="flex: 1;">
-                                    <option selected disabled hidden>😊</option>
-                                    <option value="😊">😊</option>
-                                    <option value="😍">😍</option>
-                                    <option value="🤔">🤔</option>
-                                    <option value="😒">😒</option>
-                                    <option value="😭">😭</option>
-                                    <option value="😨">😨</option>
-                                    <option value="😵">😵</option>
-                                </select>
-                                <input id="" class="form-control" type="text" style="flex: 9;">
+                                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">이름</span>
+                                <input id="name" type="text" class="form-control" style="flex: 4;">
                             </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">사진</span>
+                                <input type="file" id="fileInput" style="display: none;">
+                                <input id="image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
+                                    style="flex: 3;">
+                                <button id="selectFileBtn" type="button" class="form-control"
+                                    style="flex:1;">업로드</button>
+                                <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
+                            </div>
+                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
+                            <select class="form-select inputGroupSelect01" id="mbti" style="flex: 4;">
+                                <option selected disabled hidden>MBTI 선택</option>
+                                <script>
+                                    $(document).ready(function () {
+                                        let mbti = '';
+                                        let mbtiArray = [['E', 'I'], ['N', 'S'], ['F', 'T'], ['J', 'P']];
+                                        mbtiArray[0].forEach(e1 => {
+                                            mbtiArray[1].forEach(e2 => {
+                                                mbtiArray[2].forEach(e3 => {
+                                                    mbtiArray[3].forEach(e4 => {
+                                                        mbti = e1 + e2 + e3 + e4;
+                                                        let mbti_html = `<option value="${mbti}">${mbti}</option>`;
+                                                        $('.inputGroupSelect01').append(mbti_html);
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    })
+                                </script>
+                            </select>
                         </div>
-
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">장점</span>
+                            <input id="merit" type="text" class="form-control" style="flex: 4;">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">협업스타일</span>
+                            <input id="cbst" type="text" class="form-control" style="flex: 4;">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">블로그주소</span>
+                            <input id="blog" type="text" class="form-control" style="flex: 4;">
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">깃허브주소</span>
+                            <input id="git" type="text" class="form-control" style="flex: 4;">
+                        </div>
                         <br>
-                        <div class="text-end">
-                            <button id="btnComment" type="button" onclick="memberComment()"
-                                class="btn btn-outline-primary">방명록 쓰기</button>
-                            <button id="btnUpdate" type="button" onclick="memberUpdeate()"
-                                class="btn btn-outline-primary">수정</button>
-                            <button id="btnRemove" type="button" onclick="memberDelete()"
-                                class="btn btn-outline-primary">삭제</button>
+                        <div class="text-center">
+                            <button id="memberaddBtn" type="button" class="btn btn-danger">등록하기</button>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">닫기</button>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
