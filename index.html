@@ -100,7 +100,7 @@
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { doc, deleteDoc, query, where, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
@@ -116,11 +116,11 @@
         // Firebase 인스턴스 초기화
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // $('#selectFileBtn').click(async function () {
-        //     console.log('업로드');
-        //     $('#fileInput').click();
-        // });
+        const storage = getStorage(app);
+        $('#selectFileBtn').click(async function () {
+            console.log('업로드');
+            $('#fileInput').click();
+        });
 
         // 오류남
         // fileInput.addEventListener('change', function () {
@@ -510,7 +510,15 @@
         async function addMemberCard() {
             let name = $('#name').val();
             // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            let image = $('#image').val();
+            // 이미지 파일 업로드
+            const file = document.querySelector('#fileInput').files[0];
+            const storageRef = ref(storage, 'images/' + file.name);
+            uploadBytes(storageRef, file).then((snapshot) => {
+            });
+            
+            // 업로드 된 이미지 URL 가져오기
+            const url = await getDownloadURL(storageRef);
+            console.log(url);            
             //let file;
             try {
                 //file = $('file').val();
@@ -519,6 +527,7 @@
             } catch (error) {
                 //image = $('#image').val();
             }
+            let image = url;
             let mbti = $('#mbti').val();
             let merit = $('#merit').val();
             let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
@@ -751,7 +760,7 @@
                                 <input id="image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
                                     style="flex: 3;">
                                 <button id="selectFileBtn" type="button" class="form-control"
-                                    style="flex:1;" disabled="disabled">업로드</button>
+                                    style="flex:1;">업로드</button>
                                 <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
                             </div>
                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
