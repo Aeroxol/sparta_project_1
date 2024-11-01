@@ -100,6 +100,7 @@
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { doc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -116,6 +117,7 @@
         // Firebase 인스턴스 초기화
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         //db에서 멤버 카드 불러오기
         let cardId = 1;
@@ -181,7 +183,7 @@
                             </table>
                             <div class="mt-2 p-3 bg-body rounded shadow-sm">
                             </div>
-      
+
                             <div id="commentlist-${cardId}" class="mt-2 p-3 bg-body rounded shadow-sm">
                                 <h2 class="fs-6">방명록</h2>
                                 <div class="card mb-3" style="max-width: 600px;">
@@ -210,7 +212,7 @@
                                 </div>
                             </div>
 
-                        
+
                             <br>
                             <div class="text-end">
                                 <button id="commentSaveBtn-${cardId}" type="button"
@@ -234,7 +236,7 @@
             const card = $(this).closest('.memberCard');
             let docId = card.attr('id').split('_')[1];
             const docRef = doc(db, "profiles", docId);
-
+            
             try {
                 await deleteDoc(docRef);
                 alert("삭제 완료!");
@@ -265,10 +267,16 @@
         $('#addbtn').click(addCard);
 
         async function addCard() {
+            // 이미지 파일 업로드
+            const file = document.querySelector('#image-upload').files[0];
+            const storageRef = ref(storage, 'images/' + file.name);
+            uploadBytes(storageRef, file).then((snapshot) => {
+            });
+            // 업로드 된 이미지 URL 가져오기
+            const url = await getDownloadURL(storageRef);
+
+            let image = url;
             let name = $('#name').val();
-            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            //let image = $('#image').val();  
-            let image = '';
             let mbti = $('#mbti').val();
             let merit = $('#merit').val();
             let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
@@ -287,7 +295,7 @@
             await addDoc(collection(db, "profiles"), doc);
             alert('저장 완료!');
             window.location.reload();
-        }
+        };
 
         //버튼 클릭 이벤트
         $('#cards').on('click', `button`, function () {
@@ -372,10 +380,16 @@
         });
 
         async function updateCard(docRef) {
+            // 이미지 파일 업로드
+            const file = document.querySelector('#image-upload').files[0];
+            const storageRef = ref(storage, 'images/' + file.name);
+            uploadBytes(storageRef, file).then((snapshot) => {
+            });
+            // 업로드 된 이미지 URL 가져오기
+            const url = await getDownloadURL(storageRef);
+
+            let image = url;
             let name = $('#name').val();
-            // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
-            //let image = $('#image').val();  
-            let image = '';
             let mbti = $('#mbti').val();
             let merit = $('#merit').val();
             let cbst = $('#cbst').val(); // Collaboration style 약자 cbst
