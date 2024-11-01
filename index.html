@@ -569,7 +569,6 @@
                 'comment': comment,
                 timestamp: now
             }
-            alert();
             await addDoc(collection(db, "comments"), doc);
             window.location.reload();
         })
@@ -599,7 +598,7 @@
                         <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                         <div>
                             <!--"작성자 이름  날짜" 및 내용 출력-->
-                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp; ${doc.id}</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
+                            <h5 class="mt-0">&nbsp;&nbsp;${name} &nbsp;&nbsp;</h5><small class="text-muted">&nbsp;&nbsp;${timestamp}</small>
                         </div>
                     </div>
                     <div class="media-body" style="position: relative">
