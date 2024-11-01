@@ -120,10 +120,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // $('#selectFileBtn').click(async function () {
-        //     console.log('업로드');
-        //     $('#fileInput').click();
-        // });
+        $('#selectFileBtn').click(async function () {
+            console.log('업로드');
+            $('#fileInput').click();
+        });
 
         // 오류남
         // fileInput.addEventListener('change', function () {
@@ -315,7 +315,7 @@
                                             <input id="update-image-${cardId}" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
                                                 style="flex: 3;">
                                             <button id="selectFileBtn" type="button" class="form-control"
-                                                style="flex:1;" disabled="diabled">업로드</button>
+                                                style="flex:1;">업로드</button>
                                             <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
                                         </div>
                                         <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
@@ -514,13 +514,13 @@
             let name = $('#name').val();
             // FIXME    파일로 입력받고 DB에 업로드 후 다운로드 받은 url 값 넣어야 함. 저장 테스트를 위해 주석 처리함.
             let image = $('#image').val();
-            //let file;
+            let file;
             try {
-                //file = $('file').val();
+                file = $('file').val();
                 //file이 null이 아니면 업로드 후 url 내려받고 image에 저장
-                //image = file.url;
+                image = file.url;
             } catch (error) {
-                //image = $('#image').val();
+                image = $('#image').val();
             }
             let mbti = $('#mbti').val();
             let merit = $('#merit').val();
@@ -752,7 +752,7 @@
                                 <input id="image" type="text" class="form-control" placeholder="이미지 주소 붙여넣기"
                                     style="flex: 3;">
                                 <button id="selectFileBtn" type="button" class="form-control"
-                                    style="flex:1;" disabled="disabled">업로드</button>
+                                    style="flex:1;">업로드</button>
                                 <!-- <input id="image" type="text" class="form-control" style="flex: 4;"> -->
                             </div>
                             <span class="input-group-text" id="inputGroup-sizing-default" style="flex: 1;">MBTI</span>
