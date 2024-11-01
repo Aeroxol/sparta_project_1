@@ -279,7 +279,7 @@
                                 <button id="commentSaveBtn-${cardId}" type="button" class="btn btn-outline-primary" style="display: none;">저장</button>
                                 <button id="commentBtn-${cardId}" type="button" class="btn btn-outline-primary">방명록 쓰기</button>
                                 <button id="updateBtn-${cardId}" type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                                    data-bs-target="#updatemodal">수정</button>
+                                    data-bs-target="#updatemodal-${cardId}">수정</button>
                                 <button id="deleteBtn-${cardId}" type="button" class="btn btn-outline-primary">삭제</button>
                                 <button id="btn-" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">닫기</button>
                             </div>
@@ -287,7 +287,7 @@
                     </div>
                 </div>
                 <!-- 멤버수정창 -->
-                <div class="modal fade" id="updatemodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="updatemodal-${cardId}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -374,9 +374,9 @@
             const action = btnId.split('-')[0];
             const cardId = btnId.split('-')[1];
             const docId = $(`#detailBtn-${cardId}`).closest('.memberCard').data('id');
+            console.log(docId);
 
             console.log('id:'+cardId);
-            console.log(docId);
             if (action === 'commentBtn') {              //방명록 쓰기
                 $(`#commentSaveBtn-${cardId}`).toggle();                //저장 버튼 같이 보이기
                 $(`#commentWrite-${cardId}`).toggle();                  //방명록 쓰는 칸 같이 보이기
@@ -388,6 +388,8 @@
                     $(`#commentBtn-${cardId}`).text('방명록 쓰기');
                 }
             } else if (action === 'updateBtn') {               //멤버 카드 수정
+                $(`#updatemodal-${cardId}`).data('doc-id', docId);
+
                 let name = $(`#cardName-${cardId}`).text();
                 let mbti = $(`#cardMBTI-${cardId}`).text();
                 let merit = $(`#cardMerit-${cardId}`).text();
@@ -404,6 +406,8 @@
                 $('#update-git').val(git);
 
             } else if (action === 'memberUpdateBtn') {        //멤버 카드 수정 저장
+                const docId = $(`#updatemodal-${cardId}`).data('doc-id');
+
                 let name_ = $('#update-name').val();
                 let image_ = $('#update-image').val();
                 let mbti_ = $('#update-mbti').val();
@@ -469,7 +473,7 @@
                 alert(docId+" 수정 완료!");
                 window.location.reload();
             } catch (error) {
-                console.log(docId);
+                console.log('수정 문서 ID : '+docId);
                 console.log(newDoc);
                 console.error(error);
             }
